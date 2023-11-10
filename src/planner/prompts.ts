@@ -1,5 +1,3 @@
-import { PromptTemplate } from "../base";
-
 export const PLANNER_SYSTEM_PROMPT_MESSAGE_TEMPLATE = [
   `Let's first understand the problem and devise a plan to solve the problem.`,
   `Please output the plan starting with the header "Plan:"`,

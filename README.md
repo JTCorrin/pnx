@@ -16,3 +16,5 @@ The planner, executor and overseer are essentially made up from components:
 - Prompts
 - Output parsers
 - Memory
+
+Collectively they are chains
