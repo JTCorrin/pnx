@@ -1,7 +1,7 @@
 {
-  "name": "plan-execute-ts",
-  "version": "1.0.0",
-  "description": "",
+  "name": "pnx",
+  "version": "0.0.1",
+  "description": "pnx stands for Plan and Execute. This library aims to provide light and efficient AI agents with minimal setup and fuss",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
