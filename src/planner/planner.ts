@@ -8,6 +8,8 @@ export class Planner extends BasePlanner {
   }
 
   async plan(prompt: PromptTemplate): Promise<Plan> {
+    // Plan system message is the tools string included
+    // Plan user message is the prompt
     const response = await this.llm.call([prompt.toString()]);
     return await this.outputParser.parse(response);
   }

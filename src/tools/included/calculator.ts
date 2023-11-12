@@ -1,11 +1,11 @@
 // Calculator.ts
 import { z } from "zod";
-import { StructuredTool } from "../index";
+import { StructuredTool } from "../";
 import { Parser } from "expr-eval";
 
 // Define a Zod schema for the calculator input
 const CalculatorSchema = z.object({
-  expression: z.string(),
+  expression: z.string().describe("The calculation you wish to perform"),
 });
 
 // Define the input type for the Calculator
@@ -37,6 +37,7 @@ const calculator = new Calculator({
   name: "Simple Calculator",
   description: "A simple calculator that evaluates expressions.",
   schema: CalculatorSchema,
+  returnDirect: true,
   func: async (input) => {
     try {
       const result = Parser.evaluate(input.expression);
@@ -44,9 +45,7 @@ const calculator = new Calculator({
     } catch (error) {
       throw new Error(`Failed to evaluate expression: ${input.expression}`);
     }
-  },
-  // If you have a specific logic for returnDirect, set it here
-  // returnDirect: true or false,
+  }
 });
 
 // Export the calculator

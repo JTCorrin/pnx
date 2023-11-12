@@ -1,7 +1,6 @@
-import { BaseOutputParser } from "../base";
+import { BaseOutputParser, LLM } from "../base";
 import { PromptTemplate } from "../prompt";
-import { LLM } from "../base";
-import { StructuredTool } from "../tools/structuredTool";
+import { StructuredTool } from "../tools";
 
 /**
  * Each of the planner, executor and overseer must implement this
@@ -9,7 +8,7 @@ import { StructuredTool } from "../tools/structuredTool";
  */
 export interface ChainInputs {
   llm: LLM;
-  prompt: PromptTemplate;
+  message: PromptTemplate; // e.g. initial system message
   outputParser: BaseOutputParser;
   tools?: StructuredTool[];
 }
