@@ -1,15 +1,26 @@
-import { Step, StepAction, StepResult } from "./planner";
+import { Plan } from "./planner";
 
 /**
- * Abstract class that defines the structure for a step executor. Step
- * executors are responsible for executing a step based on inputs.
+ * Represents an action to be performed in a step.
  */
-export abstract class BaseStepExecutor {
-  abstract step(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    inputs: Record<string, any>,
-  ): Promise<StepResult>;
-}
+export type StepAction = {
+  text: string;
+};
+
+/**
+ * Represents the result of a step.
+ */
+export type StepResult = {
+  response: string;
+};
+
+/**
+ * Represents a step, which includes an action and its result.
+ */
+export type Step = {
+  action: StepAction;
+  result: StepResult;
+};
 
 /**
  * Abstract class that defines the structure for a step container. Step
@@ -18,7 +29,18 @@ export abstract class BaseStepExecutor {
 export abstract class BaseStepContainer {
   abstract addStep(action: StepAction, result: StepResult): void;
 
-  abstract getSteps(): Step[];
-
   abstract getFinalResponse(): string;
+
+  set steps(steps: Step[]) {
+    this.steps = steps;
+  }
+
+  get steps() {
+    return this.steps;
+  }
+}
+
+export abstract class BaseExecutor {
+  abstract takeStep(step: Step): Promise<Step>;
+  abstract execute(plan: Plan): Promise<void>;
 }

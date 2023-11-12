@@ -1,20 +1,6 @@
 import { z } from "zod";
 
 /**
- * Interface for the input parameters of the DynamicStructuredTool class.
- */
-export interface StructuredToolInput<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  T extends z.ZodObject<any, any, any, any> = z.ZodObject<any, any, any, any>,
-> {
-  func: (input: z.infer<T>) => Promise<string>;
-  schema: T;
-  name: string;
-  description: string;
-  returnDirect?: boolean;
-}
-
-/**
  * Base class for Tools that accept input of any shape defined by a Zod schema.
  */
 export abstract class BaseStructuredTool<
@@ -43,7 +29,9 @@ export abstract class BaseStructuredTool<
       parsed = await this.schema.parseAsync(arg);
     } catch (e) {
       throw new Error(
-        `Received tool input did not match expected schema ${JSON.stringify(arg)}`,
+        `Received tool input did not match expected schema ${JSON.stringify(
+          arg,
+        )}`,
       );
     }
     return await this._call(parsed);

@@ -13,7 +13,7 @@ export class PromptTemplate {
   static fromString(template: string, variables: InputVariables): string {
     return Object.keys(variables).reduce((acc, key) => {
       // Create a new RegExp that escapes the key to be used in a regex pattern
-      const regex = new RegExp(`{${key}}`, 'g');
+      const regex = new RegExp(`{${key}}`, "g");
       return acc.replace(regex, variables[key]);
     }, template);
   }

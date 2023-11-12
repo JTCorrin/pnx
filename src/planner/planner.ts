@@ -1,13 +1,14 @@
-import { BaseChain, BaseChainInputs } from "../base/chain";
+import { BasePlanner, Plan } from "../base";
+import { ChainInputs } from "../chain";
+import { PromptTemplate } from "../prompt";
 
+export class Planner extends BasePlanner {
+  constructor(inputs: ChainInputs) {
+    super(inputs);
+  }
 
-export class Planner extends BaseChain {
-    constructor(inputs: BaseChainInputs) {
-        super(inputs)
-    }
-
-    async call () {
-        const response = this.llm.invoke(this.prompt)
-        return this.outputParser.parse(response.text)
-    }
+  async plan(prompt: PromptTemplate): Promise<Plan> {
+    const response = await this.llm.call([prompt.toString()]);
+    return await this.outputParser.parse(response);
+  }
 }

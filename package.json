@@ -27,6 +27,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "expr-eval": "^2.0.2",
     "openai": "^4.17.3",
     "zod": "^3.22.4"
   }

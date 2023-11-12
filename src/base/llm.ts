@@ -1,4 +1,3 @@
-abstract class llm {
-
-    abstract call(messages: string[]): Promise<any>
+export abstract class LLM {
+  abstract call(messages: string[]): Promise<any>;
 }

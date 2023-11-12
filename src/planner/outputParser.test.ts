@@ -39,10 +39,7 @@ describe("PlanOutputParser", () => {
   it("should handle multiple occurrences of <END_OF_PLAN>", async () => {
     const outputText = `Plan:\n1. Step with <END_OF_PLAN> in the middle\n2. Another step<END_OF_PLAN>`;
     const expectedPlan = {
-      steps: [
-        { text: "Step with  in the middle" }, 
-        { text: "Another step" }
-      ],
+      steps: [{ text: "Step with  in the middle" }, { text: "Another step" }],
     };
     await expect(parser.parse(outputText)).resolves.toEqual(expectedPlan);
   });

@@ -1,5 +1,18 @@
 import { z } from "zod";
-import { BaseStructuredTool, StructuredToolInput } from "../base";
+import { BaseStructuredTool } from "../base";
+/**
+ * Interface for the input parameters of the DynamicStructuredTool class.
+ */
+export interface StructuredToolInput<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  T extends z.ZodObject<any, any, any, any> = z.ZodObject<any, any, any, any>,
+> {
+  func: (input: z.infer<T>) => Promise<string>;
+  schema: T;
+  name: string;
+  description: string;
+  returnDirect?: boolean;
+}
 
 export class StructuredTool<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,3 +35,5 @@ export class StructuredTool<
     return this.func(arg);
   }
 }
+
+export const defaultTools = [];

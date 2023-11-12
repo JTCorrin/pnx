@@ -17,4 +17,21 @@ The planner, executor and overseer are essentially made up from components:
 - Output parsers
 - Memory
 
-Collectively they are chains
+Collectively they are chains.
+
+The easiest way to start is to instantiate the default Executor:
+
+```typescript
+import { Agent, PromptTemplate } from "pnx";
+
+const agent = Agent.getDefault(process.env.OPENAI_KEY);
+const prompt = PromptTemplate.fromString(
+  "I need you to do {firstTask} and then move on to {secondTask}",
+  {
+    firstTask: "draft an email",
+    secondTask: "send it to alice",
+  },
+);
+
+agent.run(prompt);
+```

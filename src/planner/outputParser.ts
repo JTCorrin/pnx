@@ -5,8 +5,6 @@ import { BaseOutputParser, Plan } from "../base";
  * parse the output text into a `Plan` object.
  */
 export class PlanOutputParser extends BaseOutputParser<Plan> {
-  name = "Planner Output Parser";
-
   /**
    * Parses the output text into a `Plan` object. The steps are extracted by
    * splitting the text on newline followed by a number and a period,
