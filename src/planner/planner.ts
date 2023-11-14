@@ -15,9 +15,9 @@ export class DefaultPlanner extends BasePlanner<OpenAIMessage, OpenAI.Chat.Compl
       { role: "system", content: this.message.format() },
       { role: "user", content: prompt.format() },
     ]);
-
+    console.debug(JSON.stringify(response))
     const parsedResponse = await this.outputParser.parse(response.choices[0].message.content as string);
-    for await (const callback of this.callbacks as Function[]) {
+    for await (const callback of this.callbacks ?? []) {
       callback(JSON.stringify(parsedResponse));
     }
     return parsedResponse;

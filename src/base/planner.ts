@@ -4,6 +4,7 @@ import { PromptTemplate } from "../prompt";
 import { LLM } from "./llm";
 import { StepAction } from "./executor";
 import { StructuredTool } from "../tools";
+import { BaseChain } from "./chain";
 
 /**
  * Represents a plan, which is a sequence of step actions.
@@ -16,23 +17,12 @@ export type Plan = {
  * Abstract class that defines the structure for a planner. Planners are
  * responsible for generating a plan based on inputs.
  */
-export abstract class BasePlanner<T, R> implements ChainInputs<T, R> {
-  llm: LLM<T, R>;
-  message: PromptTemplate;
-  outputParser: PlanOutputParser;
-  callbacks?: Function[];
+export abstract class BasePlanner<T, R> extends BaseChain<T, R, PlanOutputParser> {
   constructor(inputs: ChainInputs<T, R>) {
-    this.llm = inputs.llm;
-    this.message = inputs.message;
-    this.outputParser = inputs.outputParser as PlanOutputParser;
-    this.callbacks = inputs.callbacks ?? [];
+    super(inputs)
   }
   abstract plan(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     inputs: Record<string, any>,
   ): Promise<Plan>;
-
-  static getToolString(tools: StructuredTool[]): string {
-    return tools.map((tool) => `${tool.name}: ${tool.description}`).join("\n");
-  }
 }

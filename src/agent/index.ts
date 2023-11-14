@@ -1,14 +1,19 @@
 import { BaseAgent } from "../base/agent";
-import { Executor } from "../executor/executor";
+import { DefaultExecutor } from "../executor/executor";
 import { DefaultPlanner } from "../planner/planner";
 import { DefaultLLM } from "../llm";
 import {
   PLANNER_SYSTEM_PROMPT_MESSAGE_TEMPLATE,
+  EXECUTOR_SYSTEM_PROMPT_MESSAGE_TEMPLATE,
   PromptTemplate,
+  getToolNamesDescriptions,
+  getToolSchemas,
+  getToolNames,
 } from "../prompt";
 import { StructuredTool } from "../tools";
 import defaultTools from "../tools/included/default";
 import { PlanOutputParser } from "../planner/outputParser";
+import { ExecutorOutputParser } from "../executor/outputParser";
 
 export const defaultCallback = (log: string) => { console.log(log) }
 
@@ -18,7 +23,7 @@ export const defaultCallback = (log: string) => { console.log(log) }
  */
 export interface PlanAndExecuteAgentInput {
   planner: DefaultPlanner;
-  executor: Executor;
+  executor: DefaultExecutor;
   tools?: StructuredTool[];
   callbacks?: Function[];
 }
@@ -26,7 +31,7 @@ export interface PlanAndExecuteAgentInput {
 // TODO This should have an updating array of responses that can be listened to.
 export class Agent extends BaseAgent {
   private planner: DefaultPlanner;
-  private executor: Executor;
+  private executor: DefaultExecutor;
   private tools: StructuredTool[];
   private callbacks: Function[];
 
@@ -49,10 +54,31 @@ export class Agent extends BaseAgent {
     return new DefaultPlanner({
       llm: new DefaultLLM(), //OpenAI GPT-4
       message: new PromptTemplate(PLANNER_SYSTEM_PROMPT_MESSAGE_TEMPLATE, {
-        toolString: DefaultPlanner.getToolString(tools),
+        toolString: getToolNamesDescriptions(tools),
       }),
       outputParser: new PlanOutputParser(),
-      callbacks: [defaultCallback]
+      callbacks: [defaultCallback],
+      tools
+    });
+  }
+  
+  /**
+   * The default planner uses a pre-configured prompt and OpenAI gpt-4 as its
+   * llm, which ultimately creates the plan
+   * @param tools the tools passed through to the planner. Only the name and description will be
+   * used by the planner. It doesn't use the tools to create a plan
+   * @returns Plan
+   */
+  static getDefaultExecutor(tools: StructuredTool[]) {
+    return new DefaultExecutor({
+      llm: new DefaultLLM(), //OpenAI GPT-4
+      message: new PromptTemplate(EXECUTOR_SYSTEM_PROMPT_MESSAGE_TEMPLATE, {
+        toolSchemas: getToolSchemas(tools),
+        toolNames: getToolNames(tools),
+      }),
+      outputParser: new ExecutorOutputParser(),
+      callbacks: [defaultCallback],
+      tools
     });
   }
 
@@ -67,7 +93,7 @@ export class Agent extends BaseAgent {
   static getDefault(tools: StructuredTool[] = defaultTools) {
     return new Agent({
       planner: this.getDefaultPlanner(tools),
-      executor: new Executor(),
+      executor: this.getDefaultExecutor(tools),
       tools,
       callbacks: [defaultCallback]
     });

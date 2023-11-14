@@ -1,3 +1,5 @@
+import { ChainInputs } from "../chain";
+import { BaseChain } from "./chain";
 import { Plan } from "./planner";
 
 /**
@@ -23,24 +25,52 @@ export type Step = {
 };
 
 /**
- * Abstract class that defines the structure for a step container. Step
+ * Base class that defines the structure for a step container. Step
  * containers are responsible for managing steps.
  */
-export abstract class BaseStepContainer {
-  abstract addStep(action: StepAction, result: StepResult): void;
+export class StepContainer {
+    protected _steps: Step[] = [];
+    protected _previousSteps: Step[] = []
+    
+    addNewStep(step: Step) {
+        this.steps.push(step)
+    }
 
-  abstract getFinalResponse(): string;
+    completeStep() {
+        // Remove from _steps
+        //Add to _previousSteps
+    }
+    
+    getFinalResponse(): string {
+        return "Final response";
+    }
+  
+    set steps(steps: Step[]) {
+      this._steps = steps;
+    }
+  
+    get steps(): Step[] {
+      return this._steps;
+    }
 
-  set steps(steps: Step[]) {
-    this.steps = steps;
-  }
-
-  get steps() {
-    return this.steps;
-  }
+    get previousSteps(): Step[] {
+        return this._previousSteps
+    }
 }
 
-export abstract class BaseExecutor {
-  abstract takeStep(step: Step): Promise<Step>;
+export abstract class BaseExecutor<
+    T, 
+    R, 
+    Parser, 
+> extends BaseChain<T, R, Parser> {
+
+  protected stepContainer: StepContainer;
+
+  abstract takeStep(step: Step): Promise<StepResult>;
   abstract execute(plan: Plan): Promise<void>;
+
+  constructor(inputs: ChainInputs<T, R>) {
+    super(inputs);
+    this.stepContainer = new StepContainer()
+  }
 }
