@@ -1,6 +1,6 @@
 import { BaseAgent } from "../base/agent";
 import { Executor } from "../executor/executor";
-import { Planner } from "../planner/planner";
+import { DefaultPlanner } from "../planner/planner";
 import { DefaultLLM } from "../llm";
 import {
   PLANNER_SYSTEM_PROMPT_MESSAGE_TEMPLATE,
@@ -10,12 +10,14 @@ import { StructuredTool } from "../tools";
 import defaultTools from "../tools/included/default";
 import { PlanOutputParser } from "../planner/outputParser";
 
+export const defaultCallback = (log: string) => { console.log(log) }
+
 /**
  * Interface for the input to the PlanAndExecuteAgentExecutor class. It
  * includes the planner, step executor, step container.
  */
 export interface PlanAndExecuteAgentInput {
-  planner: Planner;
+  planner: DefaultPlanner;
   executor: Executor;
   tools?: StructuredTool[];
   callbacks?: Function[];
@@ -23,7 +25,7 @@ export interface PlanAndExecuteAgentInput {
 
 // TODO This should have an updating array of responses that can be listened to.
 export class Agent extends BaseAgent {
-  private planner: Planner;
+  private planner: DefaultPlanner;
   private executor: Executor;
   private tools: StructuredTool[];
   private callbacks: Function[];
@@ -36,21 +38,38 @@ export class Agent extends BaseAgent {
     this.callbacks = inputs.callbacks ?? [];
   }
 
+  /**
+   * The default planner uses a pre-configured prompt and OpenAI gpt-4 as its
+   * llm, which ultimately creates the plan
+   * @param tools the tools passed through to the planner. Only the name and description will be
+   * used by the planner. It doesn't use the tools to create a plan
+   * @returns Plan
+   */
   static getDefaultPlanner(tools: StructuredTool[]) {
-    return new Planner({
+    return new DefaultPlanner({
       llm: new DefaultLLM(), //OpenAI GPT-4
       message: new PromptTemplate(PLANNER_SYSTEM_PROMPT_MESSAGE_TEMPLATE, {
-        toolString: Planner.getToolString(tools),
+        toolString: DefaultPlanner.getToolString(tools),
       }),
       outputParser: new PlanOutputParser(),
+      callbacks: [defaultCallback]
     });
   }
 
+  /**
+   * Use this to instantiate the default Agent setup. It comes with OpenAI gpt-4
+   * as the default LLM. Simply pass it tools if you have custom tools or
+   * pass nothing and get a few basic/defaul tools including a calculator.
+   *  Good for basic setups and a wide range of use cases.
+   * @param tools the tools available to this agent. Defaults to defaultTools
+   * @returns a new Agent
+   */
   static getDefault(tools: StructuredTool[] = defaultTools) {
     return new Agent({
       planner: this.getDefaultPlanner(tools),
       executor: new Executor(),
       tools,
+      callbacks: [defaultCallback]
     });
   }
 

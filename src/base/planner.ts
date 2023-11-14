@@ -16,12 +16,12 @@ export type Plan = {
  * Abstract class that defines the structure for a planner. Planners are
  * responsible for generating a plan based on inputs.
  */
-export abstract class BasePlanner implements ChainInputs {
-  llm: LLM<any, any>;
+export abstract class BasePlanner<T, R> implements ChainInputs<T, R> {
+  llm: LLM<T, R>;
   message: PromptTemplate;
   outputParser: PlanOutputParser;
   callbacks?: Function[];
-  constructor(inputs: ChainInputs) {
+  constructor(inputs: ChainInputs<T, R>) {
     this.llm = inputs.llm;
     this.message = inputs.message;
     this.outputParser = inputs.outputParser as PlanOutputParser;
