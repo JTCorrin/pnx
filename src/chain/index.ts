@@ -7,8 +7,9 @@ import { StructuredTool } from "../tools";
  * interface.
  */
 export interface ChainInputs {
-  llm: LLM;
+  llm: LLM<any, any>;
   message: PromptTemplate; // e.g. initial system message
   outputParser: BaseOutputParser;
   tools?: StructuredTool[];
+  callbacks?: Function[];
 }

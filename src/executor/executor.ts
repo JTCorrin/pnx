@@ -35,10 +35,9 @@ export class Executor extends BaseExecutor {
       throw Error("The plan doesn't have any steps to execute");
     }
 
-    this.stepContainer.steps = plan.steps.map((action) => {});
-    for await (const step of this.stepContainer.steps) {
-      await this.takeStep(step);
-    }
-    s;
+    // this.stepContainer.steps = plan.steps.map((action) => {});
+    // for await (const step of this.stepContainer.steps) {
+    //   await this.takeStep(step);
+    // }
   }
 }

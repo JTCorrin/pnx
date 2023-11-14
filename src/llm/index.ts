@@ -1,23 +1,36 @@
 import OpenAI from "openai";
 import { LLM } from "../base";
+import * as dotenv from "dotenv";
+dotenv.config();
 
-export class OpenAILLM extends LLM {
+export interface OpenAIMessage {
+  role: "system" | "assistant" | "user";
+  content: string;
+  name?: string;
+}
+
+export class OpenAILLM extends LLM<
+  OpenAIMessage,
+  OpenAI.Chat.Completions.ChatCompletion
+> {
   private openai: OpenAI;
   constructor() {
     super();
     this.openai = new OpenAI({
-      apiKey: "api-key", //process.env.OPENAI_API,
-      organization: "",
+      apiKey: process.env.OPENAI_API, //process.env.OPENAI_API,
+      organization: process.env.ORG_ID ?? "",
     });
   }
 
-  async call(messages: string[]): Promise<any> {
+  async call(
+    messages: OpenAIMessage[],
+  ): Promise<OpenAI.Chat.Completions.ChatCompletion> {
     const completion = await this.openai.chat.completions.create({
-      messages: [{ role: "system", content: "You are a helpful assistant." }],
-      model: "gpt-3.5-turbo",
+      messages,
+      model: "gpt-4",
     });
 
-    console.log(completion.choices[0]);
+    return completion;
   }
 }
 

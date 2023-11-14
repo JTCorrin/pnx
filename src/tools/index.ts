@@ -35,5 +35,3 @@ export class StructuredTool<
     return this.func(arg);
   }
 }
-
-export const defaultTools = [];

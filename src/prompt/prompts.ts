@@ -6,7 +6,7 @@ export const PLANNER_SYSTEM_PROMPT_MESSAGE_TEMPLATE = [
   `to answer the query or complete the task accurately and precisely.`,
   `You have a set of tools at your disposal to help you with this task:`,
   "",
-  "{toolStrings}",
+  "{toolString}",
   "",
   `You must consider these tools when coming up with your plan.`,
   `If the task is a question, the final step in the plan must be the following: "Given the above steps taken,`,

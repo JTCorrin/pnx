@@ -7,7 +7,7 @@ describe("PromptTemplate", () => {
       const variables = { name: "Alice", place: "Wonderland" };
       const expected = "Hello, Alice! Welcome to Wonderland.";
 
-      const result = PromptTemplate.fromString(template, variables);
+      const result = new PromptTemplate(template, variables).format();
 
       expect(result).toBe(expected);
     });
@@ -17,7 +17,7 @@ describe("PromptTemplate", () => {
       const variables = { repeat: "echo" };
       const expected = "echo echo echo";
 
-      const result = PromptTemplate.fromString(template, variables);
+      const result = new PromptTemplate(template, variables).format();
 
       expect(result).toBe(expected);
     });
@@ -27,7 +27,7 @@ describe("PromptTemplate", () => {
       const variables = { unused: "variable" };
       const expected = "No placeholders here.";
 
-      const result = PromptTemplate.fromString(template, variables);
+      const result = new PromptTemplate(template, variables).format();
 
       expect(result).toBe(expected);
     });
@@ -37,7 +37,7 @@ describe("PromptTemplate", () => {
       const variables = {};
       const expected = "Hello, {name}!";
 
-      const result = PromptTemplate.fromString(template, variables);
+      const result = new PromptTemplate(template, variables).format();
 
       expect(result).toBe(expected);
     });
@@ -47,7 +47,7 @@ describe("PromptTemplate", () => {
       const variables = { special: "$^*+?.()|{}[]\\" };
       const expected = "Special characters: $^*+?.()|{}[]\\";
 
-      const result = PromptTemplate.fromString(template, variables);
+      const result = new PromptTemplate(template, variables).format();
 
       expect(result).toBe(expected);
     });
@@ -57,7 +57,7 @@ describe("PromptTemplate", () => {
       const variables = { name: "Bob" };
       const expected = "Hello, Bob. How are you?";
 
-      const result = PromptTemplate.fromString(template, variables);
+      const result = new PromptTemplate(template, variables).format();
 
       expect(result).toBe(expected);
     });

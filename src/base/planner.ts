@@ -17,22 +17,22 @@ export type Plan = {
  * responsible for generating a plan based on inputs.
  */
 export abstract class BasePlanner implements ChainInputs {
-  llm: LLM;
+  llm: LLM<any, any>;
   message: PromptTemplate;
   outputParser: PlanOutputParser;
+  callbacks?: Function[];
   constructor(inputs: ChainInputs) {
     this.llm = inputs.llm;
     this.message = inputs.message;
     this.outputParser = inputs.outputParser as PlanOutputParser;
+    this.callbacks = inputs.callbacks ?? [];
   }
   abstract plan(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     inputs: Record<string, any>,
   ): Promise<Plan>;
 
-  getToolString(tools: StructuredTool[]): string {
-    return tools
-    .map((tool) => `${tool.name}: ${tool.description}`)
-    .join("\n");
+  static getToolString(tools: StructuredTool[]): string {
+    return tools.map((tool) => `${tool.name}: ${tool.description}`).join("\n");
   }
 }

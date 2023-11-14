@@ -35,7 +35,8 @@ class Calculator extends StructuredTool<typeof CalculatorSchema> {
 // Instantiate the calculator with predefined parameters
 const calculator = new Calculator({
   name: "Simple Calculator",
-  description: "A simple calculator that evaluates expressions.",
+  description:
+    "use this when you need to evaluate relatively simple mathematical expressions.",
   schema: CalculatorSchema,
   returnDirect: true,
   func: async (input) => {
@@ -45,7 +46,7 @@ const calculator = new Calculator({
     } catch (error) {
       throw new Error(`Failed to evaluate expression: ${input.expression}`);
     }
-  }
+  },
 });
 
 // Export the calculator

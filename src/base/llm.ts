@@ -1,3 +1,4 @@
-export abstract class LLM {
-  abstract call(messages: string[]): Promise<any>;
+export abstract class LLM<T, R> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  abstract call(messages: T[]): Promise<R>;
 }
