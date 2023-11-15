@@ -50,7 +50,7 @@ export const PLANNER_SYSTEM_PROMPT_MESSAGE_TEMPLATE = [
 ].join(" ");
 
 export const EXECUTOR_SYSTEM_PROMPT_MESSAGE_TEMPLATE = [
-    `Concentrate as the following is important. It details some precise instructions you must follow.`,
+    `Please concentrate as the following is important; it details some precise instructions you must follow.`,
     `You have access to the following tools and you must format`,
     `your inputs to these tools to match their "JSON schema" definitions below.`,
     `JSON Schema" is a declarative language that allows you to annotate and validate JSON documents.`,

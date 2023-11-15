@@ -2,7 +2,6 @@ import {
   BaseExecutor,
   Plan,
   Step,
-  StepAction,
   StepResult,
 } from "../base";
 
@@ -31,14 +30,14 @@ export class DefaultExecutor extends BaseExecutor<
     const response = await this.llm.call([
         { role: "system", content: this.message.format() },
         { role: "user", content: new PromptTemplate(EXECUTOR_USER_PROMPT_MESSAGE_TEMPLATE, {
-            previousSteps: "[]",
+            previousSteps: this.stepContainer.formatPreviousSteps(),
             currentStep: step.action.text,
-            agentScratchPage: ""
+            agentScratchpad: ""
           }).format() 
         },
       ]);
 
-      return await this.outputParser.parse(response.choices[0].message.content as string);
+      return await this.outputParser.parse(response.choices[0].message.content as string); // Need to extract scratchpad?
   }
 
   async execute(plan: Plan) {
@@ -46,18 +45,35 @@ export class DefaultExecutor extends BaseExecutor<
       throw Error("The plan doesn't have any steps to execute");
     }
 
-    plan.steps.forEach(step => this.stepContainer.addNewStep({ action: step, result: { response: "" } }))
+    plan.steps.forEach((step) => this.stepContainer.addNewStep({ 
+        action: step, 
+        result: { 
+            actionDecision: "", 
+            action: "", 
+            actionInput: "",
+            actionOutput: "" 
+        } 
+    }))
+
     for await (const step of this.stepContainer.steps) {
-        console.debug(`Taking step: ${JSON.stringify(step.action.text)}`)
       const result = await this.takeStep(step);
       step.result = result
+      // Zod parse the action inputParse
+      const selectedTool = this.tools?.find(tool => tool.name == step.result.action)
+      if (selectedTool) {
 
-      // TODO this result.response has the json blob within it - the parser needs to parse that out and it should then be passed to the tool.
-
-      // Put the step into the complete steps
-      for await (const callback of this.callbacks ?? []) {
-        await callback(JSON.stringify(step))
+            const toolOutput = await selectedTool.call(step.result.actionInput)
+            step.result.actionOutput = toolOutput
+            for await (const callback of this.callbacks ?? []) {
+                await callback(JSON.stringify(step))
+            }
+          
+      } else {
+        // TODO Inject a `request for reattempt step`
+        throw Error("Did not provide a recognised tool for action")
       }
+
+      this.stepContainer.completeStep(step)
     }
   }
 }

@@ -2,7 +2,7 @@ import { BaseOutputParser, Plan } from "../base";
 
 /**
  * Specific implementation of the `BaseOutputParser` class designed to
- * parse the output text into a `Plan` object.
+ * parse the models output text into a `Plan` object.
  */
 export class PlanOutputParser extends BaseOutputParser<Plan> {
   /**

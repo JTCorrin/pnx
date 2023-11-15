@@ -27,6 +27,7 @@ const conversation = new Conversation({
   schema: ConversationSchema,
   returnDirect: true,
   func: async (input) => {
+    console.log(input);
     return input.response;
   },
 });

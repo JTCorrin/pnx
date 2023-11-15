@@ -4,6 +4,11 @@ import { PromptTemplate } from "../prompt";
 import { OpenAIMessage } from "../llm";
 import OpenAI from "openai";
 
+/**
+ * The default planner is the OOTB planner created to work with OpenAIs GPT4 model. It will
+ * take the users prompt and create a plan of execution from it, using the tools available
+ * to it.
+ */
 export class DefaultPlanner extends BasePlanner<OpenAIMessage, OpenAI.Chat.Completions.ChatCompletion> {
   constructor(inputs: ChainInputs<OpenAIMessage, OpenAI.Chat.Completions.ChatCompletion>) {
     super(inputs);

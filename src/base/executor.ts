@@ -10,10 +10,18 @@ export type StepAction = {
 };
 
 /**
- * Represents the result of a step.
+ * Represents the result of a step. Will always have
+ * a tool (action) name, and tool (action) input
  */
 export type StepResult = {
-  response: string;
+  // The full text response from the model when taking a decision on tool usage 
+  actionDecision: string;
+  // The chosen tool as chosen by the model
+  action: any,
+  // The tools function params as given to it by the model
+  actionInput: any,
+  // The string output of the tools execution
+  actionOutput: string
 };
 
 /**
@@ -36,9 +44,15 @@ export class StepContainer {
         this.steps.push(step)
     }
 
-    completeStep() {
+    completeStep(step: Step) {
         // Remove from _steps
+
         //Add to _previousSteps
+        this._previousSteps.push(step)
+    }
+
+    formatPreviousSteps() {
+        return JSON.stringify(this._previousSteps)
     }
     
     getFinalResponse(): string {
