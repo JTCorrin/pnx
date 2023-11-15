@@ -99,8 +99,8 @@ export class Agent extends BaseAgent {
     });
   }
 
-  async run(prompt: PromptTemplate) {
+  async run(prompt: PromptTemplate): Promise<string> {
     const plan = await this.planner.plan(prompt); // input here should be prompt and tools
-    await this.executor.execute(plan);
+    return await this.executor.execute(plan);
   }
 }

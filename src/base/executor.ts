@@ -17,9 +17,10 @@ export type StepResult = {
   // The full text response from the model when taking a decision on tool usage 
   actionDecision: string;
   // The chosen tool as chosen by the model
-  action: any,
+  action: string,
   // The tools function params as given to it by the model
-  actionInput: any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  actionInput: Record<string, any>,
   // The string output of the tools execution
   actionOutput: string
 };
@@ -56,7 +57,7 @@ export class StepContainer {
     }
     
     getFinalResponse(): string {
-        return "Final response";
+        return this._previousSteps[this._previousSteps.length - 1].result.actionOutput
     }
   
     set steps(steps: Step[]) {
@@ -81,7 +82,7 @@ export abstract class BaseExecutor<
   protected stepContainer: StepContainer;
 
   abstract takeStep(step: Step): Promise<StepResult>;
-  abstract execute(plan: Plan): Promise<void>;
+  abstract execute(plan: Plan): Promise<string>;
 
   constructor(inputs: ChainInputs<T, R>) {
     super(inputs);

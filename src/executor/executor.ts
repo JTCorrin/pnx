@@ -41,6 +41,7 @@ export class DefaultExecutor extends BaseExecutor<
   }
 
   async execute(plan: Plan) {
+
     if (plan.steps.length < 1) {
       throw Error("The plan doesn't have any steps to execute");
     }
@@ -50,7 +51,7 @@ export class DefaultExecutor extends BaseExecutor<
         result: { 
             actionDecision: "", 
             action: "", 
-            actionInput: "",
+            actionInput: {},
             actionOutput: "" 
         } 
     }))
@@ -61,13 +62,11 @@ export class DefaultExecutor extends BaseExecutor<
       // Zod parse the action inputParse
       const selectedTool = this.tools?.find(tool => tool.name == step.result.action)
       if (selectedTool) {
-
-            const toolOutput = await selectedTool.call(step.result.actionInput)
-            step.result.actionOutput = toolOutput
-            for await (const callback of this.callbacks ?? []) {
-                await callback(JSON.stringify(step))
-            }
-          
+          const toolOutput = await selectedTool.call(step.result.actionInput)
+          step.result.actionOutput = toolOutput
+          for await (const callback of this.callbacks ?? []) {
+              await callback(JSON.stringify(step))
+          }  
       } else {
         // TODO Inject a `request for reattempt step`
         throw Error("Did not provide a recognised tool for action")
@@ -75,5 +74,7 @@ export class DefaultExecutor extends BaseExecutor<
 
       this.stepContainer.completeStep(step)
     }
+
+    return this.stepContainer.getFinalResponse()
   }
 }
