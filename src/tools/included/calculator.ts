@@ -8,23 +8,22 @@ const CalculatorSchema = z.object({
   expression: z.string().describe("The calculation you wish to perform"),
 });
 
-
 class Calculator extends StructuredTool<typeof CalculatorSchema> {
   constructor() {
     super({
-        name: "Simple Calculator",
-        description:
-          "use this when you need to evaluate relatively simple mathematical expressions",
-        schema: CalculatorSchema,
-        returnDirect: true,
-        func: async (input) => {
-          try {
-            const result = Parser.evaluate(input.expression);
-            return result.toString();
-          } catch (error) {
-            throw new Error(`Failed to evaluate expression: ${input.expression}`);
-          }
-        },
+      name: "Simple Calculator",
+      description:
+        "use this when you need to evaluate relatively simple mathematical expressions",
+      schema: CalculatorSchema,
+      returnDirect: true,
+      func: async (input) => {
+        try {
+          const result = Parser.evaluate(input.expression);
+          return result.toString();
+        } catch (error) {
+          throw new Error(`Failed to evaluate expression: ${input.expression}`);
+        }
+      },
     });
   }
 }

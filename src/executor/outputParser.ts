@@ -16,18 +16,18 @@ export class ExecutorOutputParser extends BaseOutputParser<StepResult> {
     const regex = /```(?:json)?(.*)(```)/gs;
     const actionMatch = regex.exec(text);
     if (actionMatch === null) {
-        throw new Error(
-            `Could not parse an action. The agent action must be within a markdown code block, and "action" must be a provided tool or "Final Answer"`
-        );
+      throw new Error(
+        `Could not parse an action. The agent action must be within a markdown code block, and "action" must be a provided tool or "Final Answer"`,
+      );
     }
     const response = JSON.parse(actionMatch[1].trim());
-    console.debug(response)
+    console.debug(response);
     const { action, action_input: actionInput } = response;
     return {
       actionDecision: text,
       action,
       actionInput,
-      actionOutput: ""
+      actionOutput: "",
     };
   }
 }

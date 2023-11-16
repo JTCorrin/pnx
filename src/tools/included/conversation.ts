@@ -5,18 +5,17 @@ const ConversationSchema = z.object({
   response: z.string().describe("Your response to the user"),
 });
 
-
 class ConversationTool extends StructuredTool<typeof ConversationSchema> {
   constructor() {
     super({
-        name: "Conversation",
-        description:
-          "use this when you the user strikes up a conversation e.g. they ask 'How are you?'. Useful if none of the other tools are appropriate. You can respond however you deem appropriate",
-        schema: ConversationSchema,
-        returnDirect: true,
-        func: async (input) => {
-          return input.response;
-        }
+      name: "Conversation",
+      description:
+        "use this when you the user strikes up a conversation e.g. they ask 'How are you?'. Useful if none of the other tools are appropriate. You can respond however you deem appropriate",
+      schema: ConversationSchema,
+      returnDirect: true,
+      func: async (input) => {
+        return input.response;
+      },
     });
   }
 }

@@ -14,9 +14,13 @@ export type Plan = {
  * Abstract class that defines the structure for a planner. Planners are
  * responsible for generating a plan based on inputs.
  */
-export abstract class BasePlanner<T, R> extends BaseChain<T, R, PlanOutputParser> {
+export abstract class BasePlanner<T, R> extends BaseChain<
+  T,
+  R,
+  PlanOutputParser
+> {
   constructor(inputs: ChainInputs<T, R>) {
-    super(inputs)
+    super(inputs);
   }
   abstract plan(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

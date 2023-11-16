@@ -15,7 +15,9 @@ import defaultTools from "../tools/included/default";
 import { PlanOutputParser } from "../planner/outputParser";
 import { ExecutorOutputParser } from "../executor/outputParser";
 
-export const defaultCallback = (log: string) => { console.log(log) }
+export const defaultCallback = (log: string) => {
+  console.log(log);
+};
 
 /**
  * Interface for the input to the PlanAndExecuteAgentExecutor class. It
@@ -58,10 +60,10 @@ export class Agent extends BaseAgent {
       }),
       outputParser: new PlanOutputParser(),
       callbacks: [defaultCallback],
-      tools
+      tools,
     });
   }
-  
+
   /**
    * The default planner uses a pre-configured prompt and OpenAI gpt-4 as its
    * llm, which ultimately creates the plan
@@ -78,7 +80,7 @@ export class Agent extends BaseAgent {
       }),
       outputParser: new ExecutorOutputParser(),
       callbacks: [defaultCallback],
-      tools
+      tools,
     });
   }
 
@@ -95,7 +97,7 @@ export class Agent extends BaseAgent {
       planner: this.getDefaultPlanner(tools),
       executor: this.getDefaultExecutor(tools),
       tools,
-      callbacks: [defaultCallback]
+      callbacks: [defaultCallback],
     });
   }
 

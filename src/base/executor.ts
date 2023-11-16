@@ -15,15 +15,15 @@ export type StepAction = {
  * a tool (action) name, and tool (action) input
  */
 export type StepResult = {
-  // The full text response from the model when taking a decision on tool usage 
+  // The full text response from the model when taking a decision on tool usage
   actionDecision: string;
   // The chosen tool as chosen by the model
-  action: string,
+  action: string;
   // The tools function params as given to it by the model
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  actionInput: Record<string, any>,
+  actionInput: Record<string, any>;
   // The string output of the tools execution
-  actionOutput: string
+  actionOutput: string;
 };
 
 /**
@@ -39,48 +39,48 @@ export type Step = {
  * containers are responsible for managing steps.
  */
 export class StepContainer {
-    protected _steps: Step[] = [];
-    protected _previousSteps: Step[] = []
-    
-    addNewStep(step: Step) {
-        this.steps.push(step)
-    }
+  protected _steps: Step[] = [];
+  protected _previousSteps: Step[] = [];
 
-    completeStep(step: Step) {
-        // Remove from _steps
+  addNewStep(step: Step) {
+    this.steps.push(step);
+  }
 
-        //Add to _previousSteps
-        this._previousSteps.push(step)
-    }
+  completeStep(step: Step) {
+    // Remove from _steps
 
-    formatPreviousSteps() {
-        return JSON.stringify(this._previousSteps)
-    }
+    //Add to _previousSteps
+    this._previousSteps.push(step);
+  }
 
-    getFinalResponse() {
-        // TODO put some check in here
-        return this._previousSteps[this._previousSteps.length - 1].result!.actionOutput
-    }
-  
-    set steps(steps: Step[]) {
-      this._steps = steps;
-    }
-  
-    get steps(): Step[] {
-      return this._steps;
-    }
+  formatPreviousSteps() {
+    return JSON.stringify(this._previousSteps);
+  }
 
-    get previousSteps(): Step[] {
-        return this._previousSteps
-    }
+  getFinalResponse() {
+    // TODO put some check in here
+    return this._previousSteps[this._previousSteps.length - 1].result!
+      .actionOutput;
+  }
+
+  set steps(steps: Step[]) {
+    this._steps = steps;
+  }
+
+  get steps(): Step[] {
+    return this._steps;
+  }
+
+  get previousSteps(): Step[] {
+    return this._previousSteps;
+  }
 }
 
-export abstract class BaseExecutor<
-    T, 
-    R, 
-    Parser, 
-> extends BaseChain<T, R, Parser> {
-
+export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
+  T,
+  R,
+  Parser
+> {
   protected stepContainer: StepContainer;
 
   abstract takeStep(step: Step): Promise<StepResult>;
@@ -88,11 +88,11 @@ export abstract class BaseExecutor<
 
   constructor(inputs: ChainInputs<T, R>) {
     super(inputs);
-    this.stepContainer = new StepContainer()
+    this.stepContainer = new StepContainer();
   }
 
   async getSummaryResponse(message: T[]): Promise<R> {
     const response = await this.llm.call(message);
-    return response
-}
+    return response;
+  }
 }
