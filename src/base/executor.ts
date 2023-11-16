@@ -1,4 +1,5 @@
 import { ChainInputs } from "../chain";
+import { PromptTemplate } from "../prompt";
 import { BaseChain } from "./chain";
 import { Plan } from "./planner";
 
@@ -30,7 +31,7 @@ export type StepResult = {
  */
 export type Step = {
   action: StepAction;
-  result: StepResult;
+  result?: StepResult;
 };
 
 /**
@@ -55,9 +56,10 @@ export class StepContainer {
     formatPreviousSteps() {
         return JSON.stringify(this._previousSteps)
     }
-    
-    getFinalResponse(): string {
-        return this._previousSteps[this._previousSteps.length - 1].result.actionOutput
+
+    getFinalResponse() {
+        // TODO put some check in here
+        return this._previousSteps[this._previousSteps.length - 1].result!.actionOutput
     }
   
     set steps(steps: Step[]) {
@@ -82,10 +84,15 @@ export abstract class BaseExecutor<
   protected stepContainer: StepContainer;
 
   abstract takeStep(step: Step): Promise<StepResult>;
-  abstract execute(plan: Plan): Promise<string>;
+  abstract execute(plan: Plan, prompt: PromptTemplate): Promise<string>;
 
   constructor(inputs: ChainInputs<T, R>) {
     super(inputs);
     this.stepContainer = new StepContainer()
   }
+
+  async getSummaryResponse(message: T[]): Promise<R> {
+    const response = await this.llm.call(message);
+    return response
+}
 }

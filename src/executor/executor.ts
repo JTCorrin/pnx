@@ -9,7 +9,7 @@ import { ChainInputs } from "../chain";
 import { OpenAIMessage } from "../llm";
 import OpenAI from "openai";
 import { ExecutorOutputParser } from "./outputParser";
-import { EXECUTOR_USER_PROMPT_MESSAGE_TEMPLATE, PromptTemplate } from "../prompt";
+import { EXECUTOR_SUMMARY_PROMPT, EXECUTOR_USER_PROMPT_MESSAGE_TEMPLATE, PromptTemplate } from "../prompt";
 
 
 
@@ -40,7 +40,8 @@ export class DefaultExecutor extends BaseExecutor<
       return await this.outputParser.parse(response.choices[0].message.content as string); // Need to extract scratchpad?
   }
 
-  async execute(plan: Plan) {
+  // TODO This is not abstract and should be handled at base
+  async execute(plan: Plan, prompt: PromptTemplate) {
 
     if (plan.steps.length < 1) {
       throw Error("The plan doesn't have any steps to execute");
@@ -60,12 +61,12 @@ export class DefaultExecutor extends BaseExecutor<
       const result = await this.takeStep(step);
       step.result = result
       // Zod parse the action inputParse
-      const selectedTool = this.tools?.find(tool => tool.name == step.result.action)
+      const selectedTool = this.tools?.find(tool => tool.name == step.result?.action)
       if (selectedTool) {
           const toolOutput = await selectedTool.call(step.result.actionInput)
           step.result.actionOutput = toolOutput
           for await (const callback of this.callbacks ?? []) {
-              await callback(JSON.stringify(step))
+              await callback(step.result)
           }  
       } else {
         // TODO Inject a `request for reattempt step`
@@ -75,6 +76,30 @@ export class DefaultExecutor extends BaseExecutor<
       this.stepContainer.completeStep(step)
     }
 
+    if (this.stepContainer.steps.length > 1) {
+        const summaryPrompt = new PromptTemplate(EXECUTOR_SUMMARY_PROMPT, {
+            originalPrompt: prompt.format(),
+            originalPlan: JSON.stringify(plan)
+        }).format() 
+
+        const finalResponse = await this.getSummaryResponse([
+            { role: "user", content: summaryPrompt }
+        ])
+
+        this.stepContainer.completeStep({
+            action: {
+                text: summaryPrompt
+            },
+            result: {
+                action: "",
+                actionDecision: "",
+                actionInput: {},
+                actionOutput: finalResponse.choices[0].message.content as string
+            }
+        })
+
+    } 
+
     return this.stepContainer.getFinalResponse()
-  }
+}
 }

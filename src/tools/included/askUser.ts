@@ -22,7 +22,7 @@ class AskUser extends StructuredTool<typeof AskUserSchema> {
 // Instantiate the askUSer tool with predefined parameters
 const askUser = new AskUser({
   name: "Ask User",
-  description: "use this when you need to ask the user a question.",
+  description: "use this when you need to ask the user a question",
   schema: AskUserSchema,
   returnDirect: true,
   func: async (input) => {
