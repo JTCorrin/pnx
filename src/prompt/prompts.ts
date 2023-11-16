@@ -111,13 +111,11 @@ export const EXECUTOR_USER_PROMPT_MESSAGE_TEMPLATE = [
 ].join(" ");
 
 export const EXECUTOR_SUMMARY_PROMPT = [
-  `You've received a message from the user with the following content: `,
+  `Respond to this initial message as you normally would, in a polite, conversational manner: `,
   "",
-  `{originalPrompt}`,
+  `"{originalPrompt}"`,
   "",
-  `In order to respond you've taken the following steps:`,
+  `Here is some context that might be useful to you when responding. Feel free to draw on it (or not) in your final response:`,
   "",
-  `{originalPlan}`,
-  "",
-  `Without refering to specific tools can you summarise what you've done in a conversational response to the user`,
+  `{originalPlan}`
 ].join(" ");
