@@ -33,7 +33,6 @@ export interface PlanAndExecuteAgentInput {
 
 // TODO This should have an updating array of responses that can be listened to.
 export class Agent extends BaseAgent {
-
   private planner: DefaultPlanner;
   private executor: DefaultExecutor;
   private tools: StructuredTool[];

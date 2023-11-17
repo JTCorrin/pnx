@@ -21,7 +21,6 @@ export class ExecutorOutputParser extends BaseOutputParser<StepResult> {
       );
     }
     const response = JSON.parse(actionMatch[1].trim());
-    console.debug(response);
     const { action, action_input: actionInput } = response;
     return {
       actionDecision: text,

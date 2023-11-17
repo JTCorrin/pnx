@@ -25,7 +25,6 @@ export class OpenAILLM extends LLM<
   async call(
     messages: OpenAIMessage[],
   ): Promise<OpenAI.Chat.Completions.ChatCompletion> {
-    console.debug(`Calling model with: ${JSON.stringify(messages)}`);
     const completion = await this.openai.chat.completions.create({
       messages,
       model: "gpt-4",

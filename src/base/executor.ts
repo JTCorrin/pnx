@@ -42,15 +42,13 @@ export type Step = {
 export class StepContainer {
   protected _steps: Step[] = [];
   protected _previousSteps: Step[] = [];
-
+  protected _finalStep: Step | null = null
+  
   addNewStep(step: Step) {
     this.steps.push(step);
   }
 
   completeStep(step: Step) {
-    // Remove from _steps
-
-    //Add to _previousSteps
     this._previousSteps.push(step);
   }
 
@@ -75,6 +73,14 @@ export class StepContainer {
   get previousSteps(): Step[] {
     return this._previousSteps;
   }
+
+  get finalStep() {
+    return this._finalStep as Step
+  }
+  
+  set finalStep(step: Step) {
+    this._finalStep = step
+  }
 }
 
 export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
@@ -83,7 +89,7 @@ export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
   Parser
 > {
   protected stepContainer: StepContainer;
-  abstract planReviewer: BasePlanReviewer | null
+  abstract planReviewer: BasePlanReviewer<T, R>;
   abstract takeStep(step: Step): Promise<StepResult>;
   abstract execute(plan: Plan, prompt: PromptTemplate): Promise<string>;
 

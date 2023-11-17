@@ -11,8 +11,8 @@ export interface StructuredToolInput<
   schema: T;
   name: string;
   description: string;
-  requiresResponse?: boolean
-  triggersReview?: boolean
+  requiresResponse?: boolean;
+  triggersReview?: boolean;
   returnDirect?: boolean;
 }
 
@@ -25,14 +25,14 @@ export class StructuredTool<
   func: StructuredToolInput["func"];
   schema: T;
   triggersReview: boolean;
-  returnDirect: boolean
-  requiresResponse: boolean
+  returnDirect: boolean;
+  requiresResponse: boolean;
   constructor(fields: StructuredToolInput<T>) {
     super();
     this.name = fields.name;
     this.description = fields.description;
     this.func = fields.func;
-    this.triggersReview = fields.triggersReview ?? false
+    this.triggersReview = fields.triggersReview ?? false;
     this.returnDirect = fields.returnDirect ?? false;
     this.requiresResponse = fields.requiresResponse ?? false;
     this.schema = fields.schema;

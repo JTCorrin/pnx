@@ -10,9 +10,9 @@ export abstract class BaseStructuredTool<
   abstract schema: T | z.ZodEffects<T>;
   abstract name: string;
   abstract description: string;
-//   triggersReview = false
-//   requiresResponse = false
-//   returnDirect = false;
+  //   triggersReview = false
+  //   requiresResponse = false
+  //   returnDirect = false;
 
   protected abstract _call(arg: z.output<T>): Promise<string>;
 

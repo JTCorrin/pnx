@@ -8,19 +8,18 @@ const AskUserSchema = z.object({
 class AskUser extends StructuredTool<typeof AskUserSchema> {
   constructor() {
     super({
-        name: "Ask User",
-        description: "use this when you need to ask the user a question",
-        schema: AskUserSchema,
-        triggersReview: true,
-        requiresResponse: true,
-        returnDirect: true,
-        func: async (input) => {
-          return input.question;
-        }
+      name: "Ask User",
+      description: "use this when you need to ask the user a question",
+      schema: AskUserSchema,
+      triggersReview: true,
+      requiresResponse: true,
+      returnDirect: true,
+      func: async (input) => {
+        return input.question;
+      },
     });
   }
 }
-
 
 const askUser = new AskUser();
 
