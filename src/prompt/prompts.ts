@@ -119,3 +119,25 @@ export const EXECUTOR_SUMMARY_PROMPT = [
   "",
   `{originalPlan}`
 ].join(" ");
+
+
+export const PLAN_REVIEW_PROMPT = [
+    `I'd like you to review an ongoing "task-plan" and decide whether it is still fit for purpose or requires change.`,
+    `The plan has been formulated to address the original request which was:`,
+    "",
+    "{originalPrompt}",
+    "",
+    `So far the following steps have been executed:`,
+    "",
+    `{previousSteps}`,
+    "",
+    `These are the remaining steps still to execute (and it is these which you need to review for suitability):`,
+    "",
+    `{remainingSteps}`,
+    "",
+    `So, are these remaining steps suitable and sufficient to answer the original request?`,
+    `If your answer is yes, simply reply YES and nothing more.`,
+    `If your answer is no, then please take careful note of the following instructions and respond accordingly:`,
+    "",
+    `${PLANNER_SYSTEM_PROMPT_MESSAGE_TEMPLATE}`
+].join(" ")

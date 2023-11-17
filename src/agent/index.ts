@@ -14,6 +14,7 @@ import { StructuredTool } from "../tools";
 import defaultTools from "../tools/included/default";
 import { PlanOutputParser } from "../planner/outputParser";
 import { ExecutorOutputParser } from "../executor/outputParser";
+import { DefaultPlanReviewer } from "../reviewer";
 
 export const defaultCallback = (log: string) => {
   console.log(log);
@@ -32,6 +33,7 @@ export interface PlanAndExecuteAgentInput {
 
 // TODO This should have an updating array of responses that can be listened to.
 export class Agent extends BaseAgent {
+
   private planner: DefaultPlanner;
   private executor: DefaultExecutor;
   private tools: StructuredTool[];

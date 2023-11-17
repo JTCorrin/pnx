@@ -1,6 +1,7 @@
 import { ChainInputs } from "../chain";
 import { PromptTemplate } from "../prompt";
 import { BaseChain } from "./chain";
+import { BasePlanReviewer } from "./planReviewer";
 import { Plan } from "./planner";
 
 /**
@@ -82,7 +83,7 @@ export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
   Parser
 > {
   protected stepContainer: StepContainer;
-
+  abstract planReviewer: BasePlanReviewer | null
   abstract takeStep(step: Step): Promise<StepResult>;
   abstract execute(plan: Plan, prompt: PromptTemplate): Promise<string>;
 

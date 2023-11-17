@@ -8,5 +8,5 @@ export abstract class BaseOutputParser<T = unknown> {
    * @param text - LLM output to parse.
    * @returns Parsed output.
    */
-  abstract parse(text: string): Promise<T>;
+  abstract parse(text: string, opts: any): Promise<T>;
 }
