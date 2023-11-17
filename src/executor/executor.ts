@@ -60,25 +60,29 @@ export class DefaultExecutor extends BaseExecutor<
       }),
     );
 
-    for await (const step of this.stepContainer.steps) {
-      const result = await this.takeStep(step);
-      step.result = result;
-      // Zod parse the action inputParse
-      const selectedTool = this.tools?.find(
-        (tool) => tool.name == step.result?.action,
-      );
-      if (selectedTool) {
-        const toolOutput = await selectedTool.call(step.result.actionInput);
-        step.result.actionOutput = toolOutput;
-        for await (const callback of this.callbacks ?? []) {
-          await callback(step.result);
+    while (this.stepContainer.steps.length > 0) {
+        const step = this.stepContainer.steps[0]; // Always takes the first element
+        const result = await this.takeStep(step);
+        step.result = result;
+        // Zod parse the action inputParse
+        const selectedTool = this.tools?.find(
+            (tool) => tool.name == step.result?.action,
+        );
+        if (selectedTool) {
+            const toolOutput = await selectedTool.call(step.result.actionInput);
+            step.result.actionOutput = toolOutput;
+            for await (const callback of this.callbacks ?? []) {
+            await callback(step.result);
+            }
+        } else {
+            // TODO Inject a `request for reattempt step`
+            throw Error("Did not provide a recognised tool for action");
         }
-      } else {
-        // TODO Inject a `request for reattempt step`
-        throw Error("Did not provide a recognised tool for action");
-      }
 
-      this.stepContainer.completeStep(step);
+        this.stepContainer.completeStep(step);
+        
+        // Remove the first step from the array, shifting all other elements forward
+        this.stepContainer.steps.shift();
     }
 
     if (this.stepContainer.steps.length > 1) {
