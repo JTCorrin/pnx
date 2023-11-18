@@ -1,11 +1,10 @@
-import { LLM, Step, StepContainer } from "../base";
+import { Step, StepContainer } from "../base";
 import { BasePlanReviewer } from "../base/planReviewer";
 import { ChainInputs } from "../chain";
 import { OpenAIMessage } from "../llm";
 import { PromptTemplate } from "../prompt";
 import OpenAI from "openai";
 
-// Perhaps the response to the user question should just be concatenated into the next plan item?
 export class DefaultPlanReviewer extends BasePlanReviewer<
   OpenAIMessage,
   OpenAI.Chat.Completions.ChatCompletion

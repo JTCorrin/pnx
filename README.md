@@ -5,7 +5,7 @@ It is made it of 4 things:
 1. Planner
 2. Executor
 3. Structured Tools
-4. Overseer
+4. Swarm Overseer / Orchestrator (Create a plan that utilises the Agents - pass a Overseer gen prompt to the agent - agent makes plan and executes)
 
 1 to 3 combined form the AgentExecutor.
 4 alone forms an agent that has the ability to sign off on and adjust the AgentExecutors plan at any point in the plans execution

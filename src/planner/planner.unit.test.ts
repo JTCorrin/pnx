@@ -1,7 +1,7 @@
 import { DefaultLLM } from "../llm";
-import { PromptTemplate } from "../prompt";
+import { PromptTemplate, getToolNamesDescriptions } from "../prompt";
 import { PlanOutputParser } from "./outputParser";
-import { Planner } from "./planner";
+import { DefaultPlanner } from "./planner";
 import { PLANNER_SYSTEM_PROMPT_MESSAGE_TEMPLATE } from "../prompt";
 import defaultTools from "../tools/included/default";
 
@@ -47,12 +47,12 @@ describe("Planner", () => {
   const mockLLM = new DefaultLLM();
   const mockMessageTemplate = new PromptTemplate(
     PLANNER_SYSTEM_PROMPT_MESSAGE_TEMPLATE,
-    { toolString: Planner.getToolString(defaultTools) },
+    { toolString: getToolNamesDescriptions(defaultTools) },
   );
   const mockOutputParser = new PlanOutputParser();
 
-  // Create a Planner instance with mocks
-  const planner = new Planner({
+  // Create a DefaultPlanner instance with mocks
+  const planner = new DefaultPlanner({
     llm: mockLLM,
     message: mockMessageTemplate,
     outputParser: mockOutputParser,
