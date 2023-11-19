@@ -117,6 +117,11 @@ class AskUser extends StructuredTool<typeof AskUserSchema> {
 
 The best way to create your own functionality on top of this framework is to create your own planner and your own executor and pass these to an instantiation of the Agent class.
 
+**🧑‍💼 What I'm currently working on:**
+
+- Complete test coverage
+- More testing in a example production project
+- Working out the "requiresReview" flag on tools and how to integrate this functionality
 
 
 ## 💁 Contributing
