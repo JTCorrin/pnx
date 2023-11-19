@@ -8,13 +8,13 @@ export abstract class BaseChain<T, R, Parser = BaseOutputParser> {
   llm: LLM<T, R>;
   message: PromptTemplate;
   outputParser: Parser;
+  tools: StructuredTool[];
   callbacks?: Function[];
-  tools?: StructuredTool[];
   constructor(inputs: ChainInputs<T, R>) {
     this.llm = inputs.llm;
     this.message = inputs.message;
     this.outputParser = inputs.outputParser as Parser;
+    this.tools = inputs.tools
     this.callbacks = inputs.callbacks ?? [];
-    this.tools = inputs.tools ?? [];
   }
 }

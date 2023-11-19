@@ -15,7 +15,6 @@ class Calculator extends StructuredTool<typeof CalculatorSchema> {
       description:
         "use this when you need to evaluate relatively simple mathematical expressions",
       schema: CalculatorSchema,
-      returnDirect: true,
       func: async (input) => {
         try {
           const result = Parser.evaluate(input.expression);

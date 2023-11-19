@@ -11,9 +11,8 @@ class AskUser extends StructuredTool<typeof AskUserSchema> {
       name: "Ask User",
       description: "use this when you need to ask the user a question",
       schema: AskUserSchema,
-      triggersReview: true,
+      triggersReview: false,
       requiresResponse: true,
-      returnDirect: true,
       func: async (input) => {
         return input.question;
       },

@@ -11,6 +11,6 @@ export interface ChainInputs<T, R> {
   llm: LLM<T, R>;
   message: PromptTemplate;
   outputParser: BaseOutputParser;
-  tools?: StructuredTool[];
+  tools: StructuredTool[];
   callbacks?: Function[];
 }
