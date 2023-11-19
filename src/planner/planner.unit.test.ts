@@ -18,17 +18,6 @@ jest.mock("../llm", () => {
   };
 });
 
-// Provide a mock implementation for the PromptTemplate class
-//   jest.mock('../prompt', () => {
-//     return {
-//       PromptTemplate: jest.fn().mockImplementation(() => {
-//         return {
-//           format: jest.fn(() => 'Formatted message')
-//         };
-//       })
-//     };
-//   });
-
 // Provide a mock implementation for the PlanOutputParser class
 jest.mock("./outputParser", () => {
   return {
@@ -59,8 +48,6 @@ describe("Planner", () => {
   });
 
   it("calls the LLM with formatted messages and returns a parsed plan", async () => {
-    console.log(mockMessageTemplate.format());
-
     const plan = await planner.plan(mockMessageTemplate);
     expect(mockLLM.call).toHaveBeenCalledWith([
       "Formatted message",

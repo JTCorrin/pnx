@@ -1,4 +1,4 @@
-import { BaseOutputParser, Plan, Step } from "../base";
+import { BaseOutputParser, Step } from "../base";
 
 /**
  * Specific implementation of the `BaseOutputParser` class designed to
