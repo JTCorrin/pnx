@@ -46,11 +46,11 @@ console.log(response)
 
 // What specific information would you like to know about the company Sony?
 
-const message2 = await agent.run(
+const response2 = await agent.run(
     new PromptTemplate("Just give me a general idea of what their main business is.")
 )
 
-console.log(message2);
+console.log(response2);
 
 // Hello! I'm doing well, thank you for asking. Now onto your questions: 4 * 4 equals 16. As for Sony, it's a multinational conglomerate corporation. Their main businesses are in electronics, gaming (such as the PlayStation consoles), entertainment (like movies and music), and financial services. They are headquartered in Tokyo, Japan. Let me know if there's anything else you'd like to know!
 
@@ -81,7 +81,7 @@ Chains are dead simple and are made up of:
 \
 **🔧 Tools**
 
-Tools are really where the neat stuff happens here. They are practically the same as Langchain tools except this library only accepts structured tools (I couldn't get my head around why non-structured tools exist), and structured tools here have a couple of extra config flags on them, namely:
+Tools are really where the neat stuff happens. They are practically the same as Langchain tools except this library only accepts structured tools (I couldn't get my head around why non-structured tools exist), and structured tools here have a couple of extra config flags on them, namely:
 
 - requiresResponse
 - triggersReview (this is still in development)
@@ -104,7 +104,6 @@ class AskUser extends StructuredTool<typeof AskUserSchema> {
       schema: AskUserSchema,
       triggersReview: false,
       requiresResponse: true,
-      returnDirect: true,
       func: async (input) => {
         return input.question;
       },
@@ -115,10 +114,13 @@ class AskUser extends StructuredTool<typeof AskUserSchema> {
 
 **⚗️ Create your own:**
 
-The best way to create your own functionality on top of this framework is to create your own planner and your own executor and pass these to an instantiation of the Agent class.
+Extending the functionality of the Default Agent via custom tools is probably the best way to use this library until its more mature and I (or someone smarter than me) comes up with another idea.
+
+Aside from that, you can create your own planner and your own executor (by subclassing the base classes) and pass these to an instantiation of the Agent class.
 
 **🧑‍💼 What I'm currently working on:**
 
+- Refactors - write better code
 - Complete test coverage
 - More testing in a example production project
 - Working out the "requiresReview" flag on tools and how to integrate this functionality
