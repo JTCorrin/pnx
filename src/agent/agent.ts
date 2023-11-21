@@ -1,20 +1,19 @@
 import { BaseAgent } from "./base";
-import { DefaultExecutor } from "../executor/executor";
-import { DefaultPlanner } from "../planner/planner";
-import { DefaultLLM } from "../llm/llm";
+import { DefaultExecutor } from "../executor";
+import { DefaultPlanner } from "../planner";
+import { DefaultLLM } from "../llm";
 import {
-  PLANNER_SYSTEM_PROMPT_MESSAGE_TEMPLATE,
-  EXECUTOR_SYSTEM_PROMPT_MESSAGE_TEMPLATE,
+    PLANNER_SYSTEM_PROMPT_MESSAGE_TEMPLATE,
+    EXECUTOR_SYSTEM_PROMPT_MESSAGE_TEMPLATE,
   PromptTemplate,
   getToolNamesDescriptions,
   getToolSchemas,
   getToolNames,
-} from "../prompt/template";
+} from "../prompt";
 import { StructuredTool } from "../tools";
 import defaultTools from "../tools/included/default";
-import { PlanOutputParser } from "../planner/outputParser";
-import { ExecutorOutputParser } from "../executor/outputParser";
-import { DefaultPlanReviewer } from "../reviewer/reviewer";
+import { PlanOutputParser } from "../planner";
+import { ExecutorOutputParser } from "../executor";
 
 export const defaultCallback = (log: string) => {
   console.log(log);
@@ -27,7 +26,7 @@ export const defaultCallback = (log: string) => {
 export interface PlanAndExecuteAgentInput {
   planner: DefaultPlanner;
   executor: DefaultExecutor;
-  tools?: StructuredTool[];
+  tools: StructuredTool[];
   callbacks?: Function[];
 }
 
