@@ -1,7 +1,7 @@
-import { PlanOutputParser } from "../planner/outputParser";
+import { PlanOutputParser } from "./outputParser";
 import { ChainInputs } from "../chain";
-import { StepAction } from "./executor";
-import { BaseChain } from "./chain";
+import { StepAction } from "../executor/base";
+import { BaseChain } from "../chain/chain";
 
 /**
  * Represents a plan, which is a sequence of step actions.

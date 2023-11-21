@@ -1,8 +1,9 @@
 import { ChainInputs } from "../chain";
-import { EXECUTOR_SUMMARY_PROMPT, PromptTemplate } from "../prompt";
-import { BaseChain } from "./chain";
-import { BasePlanReviewer } from "./planReviewer";
-import { Plan } from "./planner";
+import { PromptTemplate } from "../prompt/template";
+import { EXECUTOR_SUMMARY_PROMPT } from "../prompt";
+import { BaseChain } from "../chain/chain";
+import { BasePlanReviewer } from "../base/planReviewer";
+import { Plan } from "../planner/base";
 
 /**
  * Represents an action to be performed in a step.
@@ -42,8 +43,8 @@ export type Step = {
 export class StepContainer {
   protected _steps: Step[] = [];
   protected _previousSteps: Step[] = [];
-  protected _finalStep: Step | null = null
-  
+  protected _finalStep: Step | null = null;
+
   addNewStep(step: Step) {
     this.steps.push(step);
   }
@@ -75,11 +76,11 @@ export class StepContainer {
   }
 
   get finalStep() {
-    return this._finalStep as Step
+    return this._finalStep as Step;
   }
-  
+
   set finalStep(step: Step) {
-    this._finalStep = step
+    this._finalStep = step;
   }
 }
 
@@ -90,7 +91,7 @@ export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
 > {
   protected stepContainer: StepContainer;
   protected abstract takeStep(step: Step): Promise<StepResult>;
-  protected abstract takeFinalStep(): Promise<string>
+  protected abstract takeFinalStep(): Promise<string>;
   abstract planReviewer: BasePlanReviewer<T, R>;
 
   constructor(inputs: ChainInputs<T, R>) {
@@ -116,24 +117,27 @@ export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
 
       // Set the final step up front
       const summaryPrompt = new PromptTemplate(EXECUTOR_SUMMARY_PROMPT, {
-          originalPrompt: prompt.format(),
-          originalPlan: JSON.stringify(plan),
+        originalPrompt: prompt.format(),
+        originalPlan: JSON.stringify(plan),
       }).format();
-      
+
       this.stepContainer.finalStep = {
-          action: {
-            text: summaryPrompt,
-          },
-          result: {
-            action: "",
-            actionDecision: "",
-            actionInput: {},
-            actionOutput: "",
-          },
-        }
+        action: {
+          text: summaryPrompt,
+        },
+        result: {
+          action: "",
+          actionDecision: "",
+          actionInput: {},
+          actionOutput: "",
+        },
+      };
     } else {
-        // There was already a plan ongoing
-        this.stepContainer = this.planReviewer.integrateResponse(prompt.format(), this.stepContainer)
+      // There was already a plan ongoing
+      this.stepContainer = this.planReviewer.integrateResponse(
+        prompt.format(),
+        this.stepContainer,
+      );
     }
   }
 
@@ -143,8 +147,7 @@ export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
       throw Error("The plan doesn't have any steps to execute");
     }
 
-    this.prepareStepContainer(plan, prompt)
-    
+    this.prepareStepContainer(plan, prompt);
 
     // Execute the steps in order
     while (this.stepContainer.steps.length > 0) {
@@ -175,36 +178,33 @@ export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
 
       // Does selected tool require response?
       if (selectedTool.requiresResponse) {
-
         // Does the plan have any steps left?
         if (this.stepContainer.steps.length === 0) {
-
           // TODO this would be something we want the end user to adjust?
-            const summaryPrompt = new PromptTemplate(EXECUTOR_SUMMARY_PROMPT, {
-                originalPrompt: prompt.format(),
-                originalPlan: JSON.stringify(plan),
-            }).format();
-            
-            this.stepContainer.finalStep = {
-                action: {
-                  text: summaryPrompt,
-                },
-                result: {
-                  action: "",
-                  actionDecision: "",
-                  actionInput: {},
-                  actionOutput: "",
-                },
-              }
+          const summaryPrompt = new PromptTemplate(EXECUTOR_SUMMARY_PROMPT, {
+            originalPrompt: prompt.format(),
+            originalPlan: JSON.stringify(plan),
+          }).format();
+
+          this.stepContainer.finalStep = {
+            action: {
+              text: summaryPrompt,
+            },
+            result: {
+              action: "",
+              actionDecision: "",
+              actionInput: {},
+              actionOutput: "",
+            },
+          };
         }
 
-        // At this point the request will go back to the user. 
+        // At this point the request will go back to the user.
         return this.stepContainer.getFinalResponse();
       }
     }
-    return this.takeFinalStep()
+    return this.takeFinalStep();
   }
-
 
   async getSummaryResponse(message: T[]): Promise<R> {
     const response = await this.llm.call(message);

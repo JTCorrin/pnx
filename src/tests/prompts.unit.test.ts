@@ -1,4 +1,4 @@
-import { PromptTemplate } from "./index";
+import { PromptTemplate } from "../prompt/template";
 
 describe("PromptTemplate", () => {
   describe("fromString", () => {

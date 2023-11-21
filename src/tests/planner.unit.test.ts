@@ -1,7 +1,7 @@
 import { DefaultLLM } from "../llm";
 import { PromptTemplate, getToolNamesDescriptions } from "../prompt";
-import { PlanOutputParser } from "./outputParser";
-import { DefaultPlanner } from "./planner";
+import { PlanOutputParser } from "../planner";
+import { DefaultPlanner } from "../planner";
 import { PLANNER_SYSTEM_PROMPT_MESSAGE_TEMPLATE } from "../prompt";
 import defaultTools from "../tools/included/default";
 
@@ -45,6 +45,7 @@ describe("Planner", () => {
     llm: mockLLM,
     message: mockMessageTemplate,
     outputParser: mockOutputParser,
+    tools: defaultTools,
   });
 
   it("calls the LLM with formatted messages and returns a parsed plan", async () => {

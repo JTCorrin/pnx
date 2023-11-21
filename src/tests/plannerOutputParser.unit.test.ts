@@ -1,5 +1,5 @@
 // PlanOutputParser.test.ts
-import { PlanOutputParser } from "./outputParser"; // Adjust the import path to where your PlanOutputParser is located
+import { PlanOutputParser } from "../planner/outputParser"; // Adjust the import path to where your PlanOutputParser is located
 
 describe("PlanOutputParser", () => {
   let parser: PlanOutputParser;

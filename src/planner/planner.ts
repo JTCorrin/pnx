@@ -1,7 +1,7 @@
 import { BasePlanner, Plan } from "../base";
 import { ChainInputs } from "../chain";
-import { PromptTemplate } from "../prompt";
-import { OpenAIMessage } from "../llm";
+import { PromptTemplate } from "../prompt/template";
+import { OpenAIMessage } from "../llm/llm";
 import OpenAI from "openai";
 
 /**

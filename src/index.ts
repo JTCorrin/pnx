@@ -1,3 +1,3 @@
-export * from "./agent";
-export * from "./prompt";
+export * from "./agent/agent";
+export * from "./prompt/template";
 export * from "./tools";

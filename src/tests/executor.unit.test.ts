@@ -6,7 +6,6 @@
 // import { DefaultPlanReviewer } from '../reviewer';
 // //import OpenAI from 'openai';
 
-
 // jest.mock("../llm", () => {
 //     return {
 //       DefaultLLM: jest.fn().mockImplementation(() => {
@@ -50,7 +49,6 @@
 // // Setup common properties for tests
 // const mockLLM = new DefaultLLM();
 // const mockOutputParser = new ExecutorOutputParser();
-
 
 // describe('DefaultExecutor', () => {
 //   let executor: DefaultExecutor;

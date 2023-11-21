@@ -1,5 +1,5 @@
 // OpenAILLM.int.test.ts
-import { OpenAILLM, OpenAIMessage } from "./index";
+import { OpenAILLM, OpenAIMessage } from "../llm/llm";
 
 describe("OpenAILLM Integration", () => {
   let openAILLM: OpenAILLM;

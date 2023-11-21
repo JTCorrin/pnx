@@ -1,4 +1,4 @@
-# ⚡ pnx 
+# ⚡ pnx
 
 pnx is short for Plan and Execute - its a lightweight, narrow focussed and simple to use AI agent framework 🚀
 
@@ -12,10 +12,9 @@ You can use npm, or pnpm to install pnx
 
 `npm install pnx` or `pnpm add langchain`
 
-
 ## 🌐 Where can I use it?
 
-pnx is written in TypeScript and can be used on both the server and the browser. At time of writing I've only tested on the server though. 
+pnx is written in TypeScript and can be used on both the server and the browser. At time of writing I've only tested on the server though.
 
 Running on serverless or edge functions is not recommended at this time.
 
@@ -24,8 +23,6 @@ Running on serverless or edge functions is not recommended at this time.
 pnx is heavily inspired and influenced by the amazing Langchain library. While I was making a few contributions to that codebase it was clear to me that while Langchain seemed to have everything, I only needed one specific part of it; the Plan and Execute agents. Unfortunately, that part was not fully fleshed out (and indeed still under an experimental flag).
 
 So, pnx is my attempt at Plan and Execute agents. It is therefore a lightweight and narrow focussed module that provides a simple and intuitive api for a 'plan and execute' AI agent/s.
-
-
 
 ## 🚀 Get started
 
@@ -36,36 +33,38 @@ You can then quickly and easily spin up an agent like this:
 ```typescript
 import { Agent, PromptTemplate } from "pnx";
 
-const agent = Agent.getDefault() // Should be suitable for most scenario - uses GPT4 OOTB
+const agent = Agent.getDefault(); // Should be suitable for most scenario - uses GPT4 OOTB
 
 const response = await agent.run(
-    new PromptTemplate(`Hello, how are you today? What's 4 * 4? Oh yeah, can you give me some info on the company Sony?`)
-)
+  new PromptTemplate(
+    `Hello, how are you today? What's 4 * 4? Oh yeah, can you give me some info on the company Sony?`,
+  ),
+);
 
-console.log(response)
+console.log(response);
 
 // What specific information would you like to know about the company Sony?
 
 const response2 = await agent.run(
-    new PromptTemplate("Just give me a general idea of what their main business is.")
-)
+  new PromptTemplate(
+    "Just give me a general idea of what their main business is.",
+  ),
+);
 
 console.log(response2);
 
 // Hello! I'm doing well, thank you for asking. Now onto your questions: 4 * 4 equals 16. As for Sony, it's a multinational conglomerate corporation. Their main businesses are in electronics, gaming (such as the PlayStation consoles), entertainment (like movies and music), and financial services. They are headquartered in Tokyo, Japan. Let me know if there's anything else you'd like to know!
-
 ```
-
 
 **📃 Agents:**
 
-Agents are essentially made up of 2 parts. 
+Agents are essentially made up of 2 parts.
 
- - A planner whose task it is to create a step-by-step plan based on fulfilling whatever mission or task is outlined in the prompt (even if the prompt is a simply conversation starter like 'Hi, how are you?').
+- A planner whose task it is to create a step-by-step plan based on fulfilling whatever mission or task is outlined in the prompt (even if the prompt is a simply conversation starter like 'Hi, how are you?').
 
- - An executor whose job it is to loop over each step in the plan and request that the LLM determine what tool it should use, with what input, to fulfill the step. 
+- An executor whose job it is to loop over each step in the plan and request that the LLM determine what tool it should use, with what input, to fulfill the step.
 
- Both the planner and the executor are subclasses of the Chain class, which is inspired by the Langchain chain class - although here it is a much simpler, watered down version.
+Both the planner and the executor are subclasses of the Chain class, which is inspired by the Langchain chain class - although here it is a much simpler, watered down version.
 
 **🔗 Chains:**
 
@@ -76,7 +75,6 @@ Chains are dead simple and are made up of:
 - An output parser (converts the response from the LLM to something useable)
 - A set of "structured" tools (a la Langchain)
 - (optional) A callbacks array
-  
 
 \
 **🔧 Tools**
@@ -124,7 +122,6 @@ Aside from that, you can create your own planner and your own executor (by subcl
 - Complete test coverage
 - More testing in a example production project
 - Working out the "requiresReview" flag on tools and how to integrate this functionality
-
 
 ## 💁 Contributing
 
