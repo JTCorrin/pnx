@@ -28,6 +28,7 @@ export interface PlanAndExecuteAgentInput {
   executor: DefaultExecutor;
   tools: StructuredTool[];
   callbacks?: Function[];
+  api_key?: string
 }
 
 // TODO This should have an updating array of responses that can be listened to.
