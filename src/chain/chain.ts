@@ -1,5 +1,5 @@
 import { PromptTemplate } from "../prompt/template";
-import { StructuredTool } from "../tools";
+import { StructuredTool } from "../tools/structuredTool";
 import { LLM } from "../llm/base";
 import { BaseOutputParser } from "../base/outputParser";
 

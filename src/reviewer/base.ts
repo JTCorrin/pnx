@@ -2,7 +2,7 @@ import { ChainInputs } from "../chain";
 import { PromptTemplate } from "../prompt/template";
 import { BaseChain } from "../chain/chain";
 import { Step, StepContainer } from "../executor/base";
-import { PlanReviewerOutputParser } from "../reviewer/outputParser";
+import { PlanReviewerOutputParser } from "./outputParser";
 
 export abstract class BasePlanReviewer<T, R> extends BaseChain<
   T,

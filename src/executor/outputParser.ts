@@ -1,4 +1,5 @@
-import { BaseOutputParser, StepResult } from "../base";
+import { StepResult } from "./base";
+import { BaseOutputParser } from "../base";
 
 /**
  * Executor implementation of the `BaseOutputParser`. Designed to

@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { LLM } from "../base";
+import { LLM } from "./base";
 import * as dotenv from "dotenv";
 dotenv.config();
 

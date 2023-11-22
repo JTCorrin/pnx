@@ -1,19 +1,20 @@
-import { BaseAgent } from "./base";
+import { AgentResponse, BaseAgent } from "./base";
 import { DefaultExecutor } from "../executor";
 import { DefaultPlanner } from "../planner";
 import { DefaultLLM } from "../llm";
 import {
-    PLANNER_SYSTEM_PROMPT_MESSAGE_TEMPLATE,
-    EXECUTOR_SYSTEM_PROMPT_MESSAGE_TEMPLATE,
+  PLANNER_SYSTEM_PROMPT_MESSAGE_TEMPLATE,
+  EXECUTOR_SYSTEM_PROMPT_MESSAGE_TEMPLATE,
   PromptTemplate,
   getToolNamesDescriptions,
   getToolSchemas,
   getToolNames,
 } from "../prompt";
-import { StructuredTool } from "../tools";
+import { StructuredTool } from "../tools/structuredTool";
 import defaultTools from "../tools/included/default";
 import { PlanOutputParser } from "../planner";
 import { ExecutorOutputParser } from "../executor";
+import { Memory } from "../memory/base";
 
 export const defaultCallback = (log: string) => {
   console.log(log);
@@ -28,7 +29,7 @@ export interface PlanAndExecuteAgentInput {
   executor: DefaultExecutor;
   tools: StructuredTool[];
   callbacks?: Function[];
-  api_key?: string
+  api_key?: string;
 }
 
 // TODO This should have an updating array of responses that can be listened to.
@@ -102,8 +103,20 @@ export class Agent extends BaseAgent {
     });
   }
 
-  async run(prompt: PromptTemplate): Promise<string> {
-    const plan = await this.planner.plan(prompt); // input here should be prompt and tools
-    return this.executor.execute(plan, prompt);
+  async run(prompt: PromptTemplate, memory?: Memory): Promise<AgentResponse> {
+    // If no memory is here then we can create it
+    if (memory) {
+      return this.executor.execute(prompt, memory);
+    }
+
+    const newMemory: Memory = {
+      plan: await this.planner.plan(prompt),
+      originalPrompt: prompt,
+      latestPrompt: prompt,
+      previousSteps: [],
+      steps: [],
+    };
+
+    return this.executor.execute(prompt, newMemory);
   }
 }

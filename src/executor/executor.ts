@@ -1,4 +1,4 @@
-import { BaseExecutor, Step, StepResult } from "../base";
+import { BaseExecutor, Step, StepResult } from "./base";
 
 import { ChainInputs } from "../chain";
 import { OpenAIMessage } from "../llm";
@@ -44,6 +44,7 @@ export class DefaultExecutor extends BaseExecutor<
     ); // Need to extract scratchpad?
   }
 
+  // TODO - return string response within the memory
   async takeFinalStep(): Promise<string> {
     const response = await this.llm.call([
       {

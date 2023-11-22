@@ -1,5 +1,5 @@
-import { Step, StepContainer } from "../base";
-import { BasePlanReviewer } from "../base/planReviewer";
+import { Step, StepContainer } from "../executor";
+import { BasePlanReviewer } from "./base";
 import { ChainInputs } from "../chain";
 import { OpenAIMessage } from "../llm/llm";
 import { PromptTemplate } from "../prompt/template";

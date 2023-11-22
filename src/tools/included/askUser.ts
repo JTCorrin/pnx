@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { StructuredTool } from "..";
+import { StructuredTool } from "../structuredTool";
 
 const AskUserSchema = z.object({
   question: z.string().describe("The question you would like to ask the user"),

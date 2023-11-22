@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { StructuredTool } from "..";
+import { StructuredTool } from "../structuredTool";
 
 const ConversationSchema = z.object({
   response: z.string().describe("Your response to the user"),

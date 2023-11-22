@@ -1,6 +1,6 @@
 // Calculator.ts
 import { z } from "zod";
-import { StructuredTool } from "../";
+import { StructuredTool } from "../structuredTool";
 import { Parser } from "expr-eval";
 
 // Define a Zod schema for the calculator input

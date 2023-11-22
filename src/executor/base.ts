@@ -1,9 +1,8 @@
-import { ChainInputs } from "../chain";
-import { PromptTemplate } from "../prompt/template";
-import { EXECUTOR_SUMMARY_PROMPT } from "../prompt";
-import { BaseChain } from "../chain/chain";
-import { BasePlanReviewer } from "../base/planReviewer";
-import { Plan } from "../planner/base";
+import { ChainInputs, BaseChain } from "../chain";
+import { PromptTemplate, EXECUTOR_SUMMARY_PROMPT } from "../prompt";
+import { BasePlanReviewer } from "../reviewer";
+import { Plan } from "../planner";
+import { Memory } from "../memory/base";
 
 /**
  * Represents an action to be performed in a step.
@@ -41,9 +40,15 @@ export type Step = {
  * containers are responsible for managing steps.
  */
 export class StepContainer {
-  protected _steps: Step[] = [];
-  protected _previousSteps: Step[] = [];
-  protected _finalStep: Step | null = null;
+  protected _steps: Step[];
+  protected _previousSteps: Step[];
+  protected _finalStep: Step | null;
+
+  constructor(steps: Step[], previousSteps: Step[], finalStep?: Step) {
+    this._steps = steps;
+    this._previousSteps = previousSteps;
+    this._finalStep = finalStep ?? null;
+  }
 
   addNewStep(step: Step) {
     this.steps.push(step);
@@ -51,6 +56,7 @@ export class StepContainer {
 
   completeStep(step: Step) {
     this._previousSteps.push(step);
+    this._steps.shift();
   }
 
   formatPreviousSteps() {
@@ -89,65 +95,67 @@ export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
   R,
   Parser
 > {
-  protected stepContainer: StepContainer;
+  protected stepContainer!: StepContainer;
+
   protected abstract takeStep(step: Step): Promise<StepResult>;
   protected abstract takeFinalStep(): Promise<string>;
   abstract planReviewer: BasePlanReviewer<T, R>;
 
   constructor(inputs: ChainInputs<T, R>) {
     super(inputs);
-    this.stepContainer = new StepContainer();
   }
 
-  protected prepareStepContainer(plan: Plan, prompt: PromptTemplate) {
-    // Check if there is not already a plan on-going (final step will be empty if this is a fresh request)
-    if (this.stepContainer.finalStep == null) {
-      // Populate step container with the plan items
-      plan.steps.forEach((step) =>
-        this.stepContainer.addNewStep({
-          action: step,
-          result: {
-            actionDecision: "",
-            action: "",
-            actionInput: {},
-            actionOutput: "",
-          },
-        }),
-      );
-
-      // Set the final step up front
-      const summaryPrompt = new PromptTemplate(EXECUTOR_SUMMARY_PROMPT, {
-        originalPrompt: prompt.format(),
-        originalPlan: JSON.stringify(plan),
-      }).format();
-
-      this.stepContainer.finalStep = {
-        action: {
-          text: summaryPrompt,
-        },
+  protected prepareNewStepContainer(
+    plan: Plan,
+    prompt: PromptTemplate,
+  ): StepContainer {
+    const stepContainer = new StepContainer([], []);
+    plan.steps.forEach((step) =>
+      stepContainer.addNewStep({
+        action: step,
         result: {
-          action: "",
           actionDecision: "",
+          action: "",
           actionInput: {},
           actionOutput: "",
         },
-      };
-    } else {
-      // There was already a plan ongoing
-      this.stepContainer = this.planReviewer.integrateResponse(
-        prompt.format(),
-        this.stepContainer,
-      );
-    }
+      }),
+    );
+
+    // Set the final step up front
+    const summaryPrompt = new PromptTemplate(EXECUTOR_SUMMARY_PROMPT, {
+      originalPrompt: prompt.format(),
+      originalPlan: JSON.stringify(plan),
+    }).format();
+
+    stepContainer.finalStep = {
+      action: {
+        text: summaryPrompt,
+      },
+      result: {
+        action: "",
+        actionDecision: "",
+        actionInput: {},
+        actionOutput: "",
+      },
+    };
+
+    return stepContainer;
   }
 
-  // TODO This is not abstract and should be handled at base. Perhaps more setup should be done from the constructor
-  async execute(plan: Plan, prompt: PromptTemplate) {
+  async execute(prompt: PromptTemplate, memory: Memory) {
+    memory.latestPrompt = prompt;
+    const { plan, previousSteps, steps, finalStep } = memory;
+
     if (plan.steps.length < 1) {
       throw Error("The plan doesn't have any steps to execute");
     }
 
-    this.prepareStepContainer(plan, prompt);
+    if (steps.length == 0 && previousSteps.length == 0) {
+      this.stepContainer = this.prepareNewStepContainer(plan, prompt);
+    } else {
+      this.stepContainer = new StepContainer(steps, previousSteps, finalStep);
+    }
 
     // Execute the steps in order
     while (this.stepContainer.steps.length > 0) {
@@ -173,9 +181,6 @@ export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
 
       this.stepContainer.completeStep(step);
 
-      // Remove the first step from the array, shifting all other elements forward
-      this.stepContainer.steps.shift();
-
       // Does selected tool require response?
       if (selectedTool.requiresResponse) {
         // Does the plan have any steps left?
@@ -200,14 +205,27 @@ export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
         }
 
         // At this point the request will go back to the user.
-        return this.stepContainer.getFinalResponse();
+        return {
+          message: this.stepContainer.getFinalResponse(),
+          memory: {
+            ...memory,
+            plan,
+            previousSteps: this.stepContainer.previousSteps,
+            steps: this.stepContainer.steps,
+            finalStep: this.stepContainer.finalStep,
+          },
+        };
       }
     }
-    return this.takeFinalStep();
-  }
-
-  async getSummaryResponse(message: T[]): Promise<R> {
-    const response = await this.llm.call(message);
-    return response;
+    return {
+      message: await this.takeFinalStep(),
+      memory: {
+        ...memory,
+        plan,
+        previousSteps: this.stepContainer.previousSteps,
+        steps: this.stepContainer.steps,
+        finalStep: this.stepContainer.finalStep,
+      },
+    };
   }
 }

@@ -1,6 +1,5 @@
-import { StructuredTool } from "..";
+import { StructuredTool } from "../structuredTool";
 import askUser from "./askUser";
-import calculator from "./calculator";
 import conversation from "./conversation";
 
-export default [calculator, askUser, conversation] as StructuredTool[];
+export default [askUser, conversation] as StructuredTool[];

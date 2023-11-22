@@ -1,4 +1,5 @@
-import { BaseOutputParser, Plan } from "../base";
+import { Plan } from "./base";
+import { BaseOutputParser } from "../base";
 
 /**
  * Specific implementation of the `BaseOutputParser` class designed to
