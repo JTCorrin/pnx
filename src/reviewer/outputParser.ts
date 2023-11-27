@@ -33,6 +33,8 @@ export class PlanReviewerOutputParser extends BaseOutputParser<Step[]> {
             action: "",
             actionInput: {},
             actionOutput: "",
+            responseRequired: false,
+            reviewRequired: false
           },
         };
       });

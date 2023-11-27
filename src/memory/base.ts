@@ -8,5 +8,6 @@ export type Memory = {
   latestPrompt: PromptTemplate;
   previousSteps: Step[];
   steps: Step[];
+  planComplete: boolean
   finalStep?: Step;
 };

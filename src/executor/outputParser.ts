@@ -35,6 +35,8 @@ export class ExecutorOutputParser extends BaseOutputParser<StepResult> {
       action,
       actionInput,
       actionOutput: "",
+      responseRequired: false,
+      reviewRequired: false
     };
   }
 }

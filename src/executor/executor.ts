@@ -26,25 +26,26 @@ export class DefaultExecutor extends BaseExecutor<
   }
 
   async takeStep(step: Step): Promise<StepResult> {
-    // Taking a step consists of asking the LLM to choose a tool and provide the input json for that tool, based on the step it is given
-    const response = await this.llm.call([
-      { role: "system", content: this.message.format() },
-      {
-        role: "user",
-        content: new PromptTemplate(EXECUTOR_USER_PROMPT_MESSAGE_TEMPLATE, {
-          previousSteps: this.stepContainer.formatPreviousSteps(),
-          currentStep: step.action.text,
-          agentScratchpad: "",
-        }).format(),
-      },
-    ]);
+
+    const messages: OpenAIMessage[] = [
+        { role: "system", content: this.message.format() },
+        {
+          role: "user",
+          content: new PromptTemplate(EXECUTOR_USER_PROMPT_MESSAGE_TEMPLATE, {
+            previousSteps: this.stepContainer.formatPreviousSteps(),
+            currentStep: step.action.text,
+            agentScratchpad: "",
+          }).format(),
+        },
+      ]
+    
+    const response = await this.llm.call(messages);
 
     return await this.outputParser.parse(
       response.choices[0].message.content as string,
-    ); // Need to extract scratchpad?
+    );
   }
 
-  // TODO - return string response within the memory
   async takeFinalStep(): Promise<string> {
     const response = await this.llm.call([
       {

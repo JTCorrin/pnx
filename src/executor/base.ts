@@ -13,7 +13,8 @@ export type StepAction = {
 
 /**
  * Represents the result of a step. Will always have
- * a tool (action) name, and tool (action) input
+ * a tool (action) name, a tool input (schema), and whether
+ * this action requires a response or a plan review.
  */
 export type StepResult = {
   // The full text response from the model when taking a decision on tool usage
@@ -25,6 +26,10 @@ export type StepResult = {
   actionInput: Record<string, any>;
   // The string output of the tools execution
   actionOutput: string;
+  // Does the plan require a review because of this action?
+  reviewRequired: boolean;
+  // Does the plan require a response from the user at this stage?
+  responseRequired: boolean
 };
 
 /**
@@ -59,14 +64,19 @@ export class StepContainer {
     this._steps.shift();
   }
 
+  // Trying to consolidate / reduce the amount of additional superfluous info given to the model
   formatPreviousSteps() {
-    return JSON.stringify(this._previousSteps);
+    return JSON.stringify(this._previousSteps.map(prevStep => `{ "Action": "${prevStep.action.text}" }, { "Result": "${prevStep.result?.actionOutput}"}`));
   }
 
   getFinalResponse() {
     // TODO put some check in here
     return this._previousSteps[this._previousSteps.length - 1].result!
       .actionOutput;
+  }
+
+  isResponseRequired() {
+    return this._previousSteps[this._previousSteps.length - 1].result?.responseRequired ?? false
   }
 
   set steps(steps: Step[]) {
@@ -105,118 +115,168 @@ export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
     super(inputs);
   }
 
-  protected prepareNewStepContainer(
+  private setupSteps(
     plan: Plan,
-    prompt: PromptTemplate,
+    memory: Memory
   ): StepContainer {
-    const stepContainer = new StepContainer([], []);
-    plan.steps.forEach((step) =>
-      stepContainer.addNewStep({
-        action: step,
-        result: {
-          actionDecision: "",
-          action: "",
-          actionInput: {},
-          actionOutput: "",
-        },
-      }),
-    );
 
-    // Set the final step up front
-    const summaryPrompt = new PromptTemplate(EXECUTOR_SUMMARY_PROMPT, {
-      originalPrompt: prompt.format(),
-      originalPlan: JSON.stringify(plan),
-    }).format();
+    const { previousSteps, steps, finalStep, latestPrompt: prompt } = memory;
 
-    stepContainer.finalStep = {
-      action: {
-        text: summaryPrompt,
-      },
-      result: {
-        action: "",
-        actionDecision: "",
-        actionInput: {},
-        actionOutput: "",
-      },
-    };
+    if (steps.length == 0 && previousSteps.length == 0 || memory.planComplete) {
+       
+        const stepContainer = new StepContainer([], []);
 
-    return stepContainer;
+        plan.steps.forEach((step) =>
+
+            stepContainer.addNewStep({
+                action: step,
+                result: {
+                actionDecision: "",
+                action: "",
+                actionInput: {},
+                actionOutput: "",
+                responseRequired: false,
+                reviewRequired: false
+                },
+            }),
+
+        );
+
+        return stepContainer
+
+    } else {
+
+      let stepContainer = new StepContainer(steps, previousSteps, finalStep);
+
+      if (stepContainer.isResponseRequired()) {
+        stepContainer = this.planReviewer.integrateResponse(prompt.format(), this.stepContainer)
+      }
+      return stepContainer
+
+    }
+
   }
 
-  async execute(prompt: PromptTemplate, memory: Memory) {
-    memory.latestPrompt = prompt;
-    const { plan, previousSteps, steps, finalStep } = memory;
+  private async executeSteps(plan: Plan, memory: Memory) {
 
-    if (plan.steps.length < 1) {
-      throw Error("The plan doesn't have any steps to execute");
-    }
-
-    if (steps.length == 0 && previousSteps.length == 0) {
-      this.stepContainer = this.prepareNewStepContainer(plan, prompt);
-    } else {
-      this.stepContainer = new StepContainer(steps, previousSteps, finalStep);
-    }
-
-    // Execute the steps in order
     while (this.stepContainer.steps.length > 0) {
-      const step = this.stepContainer.steps[0]; // Always takes the first element
-      const result = await this.takeStep(step);
-      step.result = result;
+        
+        const step = this.stepContainer.steps[0];
+        step.result = await this.takeStep(step);
+                  
+        const updatedStep = await this.useTool(step)  
+        this.stepContainer.completeStep(updatedStep);
 
-      // the model has given us a step to use
-      const selectedTool = this.tools?.find(
-        (tool) => tool.name == step.result?.action,
+        // Does selected tool require response?
+        if (updatedStep.result?.responseRequired) {
+            await this.getUserResponse(plan, memory)
+        }
+    }
+  }
+
+  private async useTool(step: Step): Promise<Step> {
+    
+    if (!step.result) {
+        throw new Error("No step result - can't use tool");   
+    }
+
+    const result = step.result
+    const selectedTool = this.tools?.find(
+        (tool) => tool.name == result.action,
       );
 
       if (selectedTool) {
-        const toolOutput = await selectedTool.call(step.result.actionInput);
+        const toolOutput = await selectedTool.call(result.actionInput);
         step.result.actionOutput = toolOutput;
+        step.result.responseRequired = selectedTool.requiresResponse
+        step.result.reviewRequired = selectedTool.triggersReview
         for await (const callback of this.callbacks ?? []) {
           await callback(step.result);
         }
+
+        return step
+
       } else {
         // TODO Inject a `request for reattempt step`
         throw Error("Did not provide a recognised tool for action");
       }
+  }
 
-      this.stepContainer.completeStep(step);
+  private async getUserResponse(plan: Plan, memory: Memory) {
+    
+    // Does the plan have any steps left?
+    if (this.stepContainer.steps.length === 0) {
+        // TODO this would be something we want the end user to adjust?
+        const summaryPrompt = new PromptTemplate(EXECUTOR_SUMMARY_PROMPT, {
+          latestPrompt: memory.latestPrompt.format(),
+          originalPrompt: memory.originalPrompt.format(),
+          originalPlan: JSON.stringify(plan),
+        }).format();
 
-      // Does selected tool require response?
-      if (selectedTool.requiresResponse) {
-        // Does the plan have any steps left?
-        if (this.stepContainer.steps.length === 0) {
-          // TODO this would be something we want the end user to adjust?
-          const summaryPrompt = new PromptTemplate(EXECUTOR_SUMMARY_PROMPT, {
-            originalPrompt: prompt.format(),
-            originalPlan: JSON.stringify(plan),
-          }).format();
-
-          this.stepContainer.finalStep = {
-            action: {
-              text: summaryPrompt,
-            },
-            result: {
-              action: "",
-              actionDecision: "",
-              actionInput: {},
-              actionOutput: "",
-            },
-          };
-        }
-
-        // At this point the request will go back to the user.
-        return {
-          message: this.stepContainer.getFinalResponse(),
-          memory: {
-            ...memory,
-            plan,
-            previousSteps: this.stepContainer.previousSteps,
-            steps: this.stepContainer.steps,
-            finalStep: this.stepContainer.finalStep,
+        this.stepContainer.finalStep = {
+          action: {
+            text: summaryPrompt,
+          },
+          result: {
+            action: "",
+            actionDecision: "",
+            actionInput: {},
+            actionOutput: "",
+            responseRequired: false,
+            reviewRequired: false
           },
         };
       }
+      // At this point the request will go back to the user.
+      return {
+        message: this.stepContainer.getFinalResponse(),
+        memory: {
+          ...memory,
+          plan,
+          previousSteps: this.stepContainer.previousSteps,
+          steps: this.stepContainer.steps,
+          finalStep: this.stepContainer.finalStep,
+        },
+      }
+  }
+
+  private setFinalStep(summaryPrompt: string) {
+    this.stepContainer.finalStep = {
+        action: {
+          text: summaryPrompt,
+        },
+        result: {
+          action: "",
+          actionDecision: "",
+          actionInput: {},
+          actionOutput: "",
+          responseRequired: false,
+          reviewRequired: false
+        },
+    };
+  }
+
+  async execute(prompt: PromptTemplate, memory: Memory) {
+    
+    memory.latestPrompt = prompt;
+    const plan = memory.plan
+    
+    if (plan.steps.length < 1) {
+      throw Error("The plan doesn't have any steps to execute");
     }
+
+    this.stepContainer = this.setupSteps(plan, memory)
+    
+    await this.executeSteps(plan, memory)
+
+    const summaryPrompt = new PromptTemplate(EXECUTOR_SUMMARY_PROMPT, {
+        originalPrompt: prompt.format(),
+        latestPrompt: memory.latestPrompt.format(),
+        originalPlan: this.stepContainer.previousSteps.map(step => `\nRequirements: ${step.result?.action}. Step Result: ${step.result?.actionOutput}`).join(","),
+      }).format();
+
+    this.setFinalStep(summaryPrompt)
+    
     return {
       message: await this.takeFinalStep(),
       memory: {
@@ -225,6 +285,7 @@ export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
         previousSteps: this.stepContainer.previousSteps,
         steps: this.stepContainer.steps,
         finalStep: this.stepContainer.finalStep,
+        planComplete: true
       },
     };
   }

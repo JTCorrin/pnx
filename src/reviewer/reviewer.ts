@@ -47,16 +47,15 @@ export class DefaultPlanReviewer extends BasePlanReviewer<
   ): StepContainer {
     // place the response into the next step
     if (stepContainer.steps.length > 0) {
-      stepContainer.steps[0].action.text = `
-            This is the response to your previous question to the user ${response}. 
-            Here is the current step in the plan: ${stepContainer.steps[0].action.text}
-            `;
+      stepContainer.steps[0].action.text = `The user has responded to your previous question. This is the response they gave:
+      ${response}.
+      Here is the current step in the plan: ${stepContainer.steps[0].action.text}`;
 
       return stepContainer;
     } else {
       // The plan has been completed and the response was the last part of the plan
       stepContainer.finalStep.action.text = `${stepContainer.finalStep.action.text}\n
-        Here is the reponse from the user to your questionto your question: ${response}`;
+      The user has responded to your previous question. This is the response they gave: ${response}`;
 
       return stepContainer;
     }

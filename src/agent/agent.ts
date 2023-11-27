@@ -104,19 +104,33 @@ export class Agent extends BaseAgent {
   }
 
   async run(prompt: PromptTemplate, memory?: Memory): Promise<AgentResponse> {
-    // If no memory is here then we can create it
-    if (memory) {
+
+    if (memory && !memory.planComplete) {
+        console.debug("\nPrevious plan not complete\n")
       return this.executor.execute(prompt, memory);
     }
 
-    const newMemory: Memory = {
-      plan: await this.planner.plan(prompt),
-      originalPrompt: prompt,
-      latestPrompt: prompt,
-      previousSteps: [],
-      steps: [],
-    };
-
-    return this.executor.execute(prompt, newMemory);
+    // Plan was completed so we can create a new plan
+    try {
+        const plan = await this.planner.plan(prompt)
+    
+        // TODO keep old steps?
+        const newMemory: Memory = {
+          plan,
+          originalPrompt: prompt,
+          latestPrompt: prompt,
+          previousSteps: [],
+          planComplete: false,
+          steps: [],
+        };
+    
+        return this.executor.execute(prompt, newMemory);
+        
+    } catch (error) {
+        return {
+            message: "I was not able to formulate a response. Please refresh and try again",
+            memory: memory ?? {} as Memory
+        }
+    }
   }
 }
