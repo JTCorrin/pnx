@@ -1,13 +1,9 @@
 import { BaseExecutor, Step, StepResult } from "./base";
-
 import { ChainInputs } from "../chain";
 import { OpenAIMessage } from "../llm";
 import OpenAI from "openai";
 import { ExecutorOutputParser } from "./outputParser";
-import {
-  EXECUTOR_USER_PROMPT_MESSAGE_TEMPLATE,
-  PromptTemplate,
-} from "../prompt";
+import { EXECUTOR_USER_PROMPT_MESSAGE_TEMPLATE, PromptTemplate } from "../prompt";
 import { DefaultPlanReviewer } from "../reviewer";
 
 // Are the planner and executor the same accept the executor has stepcontainers and the planner doesnt?

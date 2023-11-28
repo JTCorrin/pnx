@@ -1,5 +1,5 @@
 import { ChainInputs, BaseChain } from "../chain";
-import { PromptTemplate, EXECUTOR_SUMMARY_PROMPT } from "../prompt";
+import { PromptTemplate, EXECUTOR_SUMMARY_PROMPT, PLAN_REVIEW_PROMPT } from "../prompt";
 import { BasePlanReviewer } from "../reviewer";
 import { Plan } from "../planner";
 import { Memory } from "../memory/base";
@@ -79,6 +79,10 @@ export class StepContainer {
     return this._previousSteps[this._previousSteps.length - 1].result?.responseRequired ?? false
   }
 
+  isReviewRequired() {
+    return this._previousSteps[this._previousSteps.length - 1].result?.reviewRequired ?? false
+  }
+
   set steps(steps: Step[]) {
     this._steps = steps;
   }
@@ -115,10 +119,10 @@ export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
     super(inputs);
   }
 
-  private setupSteps(
+  private async setupSteps(
     plan: Plan,
     memory: Memory
-  ): StepContainer {
+  ): Promise<StepContainer> {
 
     const { previousSteps, steps, finalStep, latestPrompt: prompt } = memory;
 
@@ -149,13 +153,21 @@ export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
       if (stepContainer.isResponseRequired()) {
         stepContainer = this.planReviewer.integrateResponse(prompt.format(), this.stepContainer)
       }
+
+      if (stepContainer.isReviewRequired()) {
+        stepContainer.steps = await this.planReviewer.reviewPlan(new PromptTemplate(PLAN_REVIEW_PROMPT, {
+            originalPrompt: memory.originalPrompt.format(),
+            previousSteps: JSON.stringify(previousSteps),
+            remainingSteps: JSON.stringify(steps)
+        }))
+      }
       return stepContainer
 
     }
 
   }
 
-  private async executeSteps(): Promise<boolean> {
+  private async executeSteps(): Promise<{complete: boolean, responseRequired: boolean}> {
 
     while (this.stepContainer.steps.length > 0) {
         
@@ -167,12 +179,17 @@ export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
 
         // Does selected tool require response?
         if (updatedStep.result?.responseRequired) {
-            // TODO The return does nothing
-            return false
+            return {
+                complete: false,
+                responseRequired: updatedStep.result?.responseRequired
+            }
         }
     }
 
-    return true
+    return {
+        complete: true,
+        responseRequired: false
+    }
 
   }
 
@@ -268,16 +285,14 @@ export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
     }
     
     if (plan.steps.length < 1) {
-      throw Error("The plan doesn't have any steps to execute");
+      throw new Error("The plan doesn't have any steps to execute");
     }
 
-    this.stepContainer = this.setupSteps(plan, memory)
+    this.stepContainer = await this.setupSteps(plan, memory)
+
     
-    // TODO this does not allow for a break for response or review
-    const complete = await this.executeSteps()
-    if (!complete) {
-        // Action required
-        // TODO get in the trigger review action required
+    const executionOutcome = await this.executeSteps()
+    if (!executionOutcome.complete) { // At the moment this is redundant but it might be useful when more flags are added?
         return await this.getUserResponse(plan, memory)
     }
 
