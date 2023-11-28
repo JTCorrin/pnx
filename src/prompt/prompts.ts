@@ -23,7 +23,7 @@ export const PLANNER_SYSTEM_RETRY_MESSAGE_TEMPLATE = [
 
 export const EXECUTOR_SYSTEM_PROMPT_MESSAGE_TEMPLATE = [
   `Please concentrate as the following is important;`, 
-  `here you are being provided with some precise instructions that you MUST follow.`,
+  `you are being provided with some precise instructions that you MUST follow.`,
   `To formulate your response you have access to a set of tools that will be described below.`, 
   `You must format your inputs to these tools to exactly match their "JSON schema" definitions.`,
   `"JSON Schema" is a declarative language that allows you to annotate and validate JSON documents.`,
@@ -65,8 +65,8 @@ export const EXECUTOR_SYSTEM_PROMPT_MESSAGE_TEMPLATE = [
     \`\`\`json
     $JSON_BLOB
     \`\`\``,
-  `Observation: the result of the action`,
-  `Begin! Reminder to ALWAYS use the above format, and to use tools if appropriate.`,
+  `Observation: the expected results of the action`,
+  `Begin! Remember to ALWAYS use the above format and to ALWAYS use a tool!`,
 ].join(" ");
 
 export const EXECUTOR_USER_PROMPT_MESSAGE_TEMPLATE = [

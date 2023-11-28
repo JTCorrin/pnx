@@ -122,12 +122,11 @@ export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
 
     const { previousSteps, steps, finalStep, latestPrompt: prompt } = memory;
 
-    if (steps.length == 0 && previousSteps.length == 0 || memory.planComplete) {
+    if (steps.length == 0 && previousSteps.length == 0) {
        
         const stepContainer = new StepContainer([], []);
 
         plan.steps.forEach((step) =>
-
             stepContainer.addNewStep({
                 action: step,
                 result: {
@@ -139,7 +138,6 @@ export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
                 reviewRequired: false
                 },
             }),
-
         );
 
         return stepContainer
@@ -157,7 +155,7 @@ export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
 
   }
 
-  private async executeSteps(plan: Plan, memory: Memory) {
+  private async executeSteps(): Promise<boolean> {
 
     while (this.stepContainer.steps.length > 0) {
         
@@ -169,9 +167,13 @@ export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
 
         // Does selected tool require response?
         if (updatedStep.result?.responseRequired) {
-            await this.getUserResponse(plan, memory)
+            // TODO The return does nothing
+            return false
         }
     }
+
+    return true
+
   }
 
   private async useTool(step: Step): Promise<Step> {
@@ -204,7 +206,6 @@ export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
 
   private async getUserResponse(plan: Plan, memory: Memory) {
     
-    // Does the plan have any steps left?
     if (this.stepContainer.steps.length === 0) {
         // TODO this would be something we want the end user to adjust?
         const summaryPrompt = new PromptTemplate(EXECUTOR_SUMMARY_PROMPT, {
@@ -260,6 +261,11 @@ export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
     
     memory.latestPrompt = prompt;
     const plan = memory.plan
+
+    if (!plan) {
+        throw new Error("No plan passed through to execute");
+        
+    }
     
     if (plan.steps.length < 1) {
       throw Error("The plan doesn't have any steps to execute");
@@ -267,7 +273,13 @@ export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
 
     this.stepContainer = this.setupSteps(plan, memory)
     
-    await this.executeSteps(plan, memory)
+    // TODO this does not allow for a break for response or review
+    const complete = await this.executeSteps()
+    if (!complete) {
+        // Action required
+        // TODO get in the trigger review action required
+        return await this.getUserResponse(plan, memory)
+    }
 
     const summaryPrompt = new PromptTemplate(EXECUTOR_SUMMARY_PROMPT, {
         originalPrompt: prompt.format(),
