@@ -7,7 +7,7 @@ import {
   EXECUTOR_USER_PROMPT_MESSAGE_TEMPLATE,
   PromptTemplate,
 } from "../prompt";
-import { DefaultPlanReviewer } from "../reviewer";
+import { DefaultPlanReviewer, PlanReviewerOutputParser } from "../reviewer";
 
 // Are the planner and executor the same accept the executor has stepcontainers and the planner doesnt?
 // Take step is just like plan - input and outputparser
@@ -21,7 +21,7 @@ export class DefaultExecutor extends BaseExecutor<
     inputs: ChainInputs<OpenAIMessage, OpenAI.Chat.Completions.ChatCompletion>,
   ) {
     super(inputs);
-    this.planReviewer = new DefaultPlanReviewer(inputs);
+    this.planReviewer = new DefaultPlanReviewer({ ...inputs, outputParser: new PlanReviewerOutputParser() });
   }
 
   async takeStep(step: Step): Promise<StepResult> {

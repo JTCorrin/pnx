@@ -29,27 +29,25 @@ Update the .env.example file and rename it to .env
 You can then quickly and easily spin up an agent like this:
 
 ```typescript
-import { Agent, PromptTemplate } from "pnx";
+import { Agent, PromptTemplate, type Memory } from "pnx";
 
-const agent = Agent.getDefault(); // Should be suitable for most scenario - uses GPT4 OOTB
+const agent = Agent.getDefault([yourToolsHere])
+const { message, memory: updatedMemory } = await agent.run(
+    new PromptTemplate(`Hello, how are you today? What's 4 * 4? Oh yeah, can you give me some info on the company Sony?`), 
+    memory ?? {} as Memory
+); // Should be suitable for most scenario - uses GPT4 OOTB
 
-const response = await agent.run(
-  new PromptTemplate(
-    `Hello, how are you today? What's 4 * 4? Oh yeah, can you give me some info on the company Sony?`,
-  ),
-);
-
-console.log(response);
-
+console.log(message);
 // What specific information would you like to know about the company Sony?
 
-const response2 = await agent.run(
+const { message: message2, memory: updatedMemory } = await agent.run(
   new PromptTemplate(
     "Just give me a general idea of what their main business is.",
   ),
+  updatedMemory
 );
 
-console.log(response2);
+console.log(message2);
 
 // Hello! I'm doing well, thank you for asking. Now onto your questions: 4 * 4 equals 16. As for Sony, it's a multinational conglomerate corporation. Their main businesses are in electronics, gaming (such as the PlayStation consoles), entertainment (like movies and music), and financial services. They are headquartered in Tokyo, Japan. Let me know if there's anything else you'd like to know!
 ```
@@ -80,7 +78,11 @@ Chains are dead simple and are made up of:
 Tools are really where the neat stuff happens. They are practically the same as Langchain tools except this library only accepts structured tools (I couldn't get my head around why non-structured tools exist), and structured tools here have a couple of extra config flags on them, namely:
 
 - requiresResponse
-- triggersReview
+- requiresReview
+
+These allow for some really complex plans that may evolve as they are executed.
+
+To keep this package as small and narrow as possible, I intend to create a separate tools only repo (Tool Shop) so that consumers can use only the tools that they need rather than improting everything via this package
 
 Here is the "Ask User" tool to show and example (and show how you can easily dream up your own tools):
 
@@ -98,7 +100,7 @@ class AskUser extends StructuredTool<typeof AskUserSchema> {
       name: "Ask User",
       description: "use this when you need to ask the user a question",
       schema: AskUserSchema,
-      requiresReview: false,
+      requiresReview: true,
       requiresResponse: true,
       func: async (input) => {
         return input.question;

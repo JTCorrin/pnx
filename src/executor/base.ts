@@ -3,6 +3,7 @@ import {
   PromptTemplate,
   EXECUTOR_SUMMARY_PROMPT,
   PLAN_REVIEW_PROMPT,
+  getToolNamesDescriptions,
 } from "../prompt";
 import { BasePlanReviewer } from "../reviewer";
 import { Plan } from "../planner";
@@ -177,10 +178,9 @@ export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
             originalPrompt: originalPrompt.format(),
             previousSteps: JSON.stringify(previousSteps),
             remainingSteps: JSON.stringify(steps),
+            toolString: getToolNamesDescriptions(this.tools)
           }),
         );
-
-        console.debug(`Reviewed steps: ${JSON.stringify(stepContainer.steps)}`);
       }
       return stepContainer;
     }
@@ -237,7 +237,7 @@ export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
   }
 
   private async getUserResponse(plan: Plan, memory: Memory) {
-    console.debug(`Getting user response: ${JSON.stringify(memory)}`);
+
     if (this.stepContainer.steps.length === 0) {
       // TODO this would be something we want the end user to adjust?
       const summaryPrompt = new PromptTemplate(EXECUTOR_SUMMARY_PROMPT, {
@@ -301,7 +301,6 @@ export abstract class BaseExecutor<T, R, Parser> extends BaseChain<
       throw new Error("The plan doesn't have any steps to execute");
     }
 
-    console.debug(`Memory original prompt: ${memory.originalPrompt.format()}`);
     this.stepContainer = await this.setupSteps(plan, memory);
 
     const executionOutcome = await this.executeSteps();

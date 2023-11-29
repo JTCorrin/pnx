@@ -24,7 +24,7 @@ export class DefaultPlanReviewer extends BasePlanReviewer<
    * @param reviewPrompt prompt template for the plan reviewer
    */
   async reviewPlan(reviewPrompt: PromptTemplate): Promise<Step[]> {
-    console.debug(`\nReviewing plan with ${reviewPrompt.format()}`);
+
     const response = await this.llm.call([
       {
         role: "user",
@@ -32,13 +32,12 @@ export class DefaultPlanReviewer extends BasePlanReviewer<
       },
     ]);
 
-    console.debug(
-      `\nGot response: ${response.choices[0].message.content as string}`,
-    );
-    return await this.outputParser.parse(
-      response.choices[0].message.content as string,
-      JSON.parse(reviewPrompt.getInputs()["remainingSteps"]),
-    );
+    const reviewedRemainingSteps = await this.outputParser.parse(
+        response.choices[0].message.content as string,
+        JSON.parse(reviewPrompt.getInputs()["remainingSteps"]),
+      );
+
+    return reviewedRemainingSteps
   }
 
   integrateResponse(

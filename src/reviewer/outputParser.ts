@@ -15,9 +15,12 @@ export class PlanReviewerOutputParser extends BaseOutputParser<Step[]> {
    * @returns A `Plan` object consisting of a series of steps.
    */
   async parse(text: string, originalRemainingSteps: Step[]): Promise<Step[]> {
+    
     if (text == "YES" || text == "yes") {
+        
       return originalRemainingSteps;
     } else {
+        
       const newPlan = {
         steps: text
           .split(/\n\d+\.\s?/)
