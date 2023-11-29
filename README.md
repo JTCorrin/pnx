@@ -31,7 +31,7 @@ You can then quickly and easily spin up an agent like this:
 ```typescript
 import { Agent, PromptTemplate, type Memory } from "pnx";
 
-const agent = Agent.getDefault([yourToolsHere])
+const agent = Agent.getDefault() // Add your tools here. If left blank the default tools (conversation and ask user) will be auto added
 const { message, memory: updatedMemory } = await agent.run(
     new PromptTemplate(`Hello, how are you today? What's 4 * 4? Oh yeah, can you give me some info on the company Sony?`), 
     memory ?? {} as Memory
