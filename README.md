@@ -1,6 +1,6 @@
 # ⚡ pnx
 
-pnx is short for Plan and Execute - its a lightweight, narrow focussed and simple to use AI agent framework 🚀
+pnx is short for Plan and Execute - its a lightweight, narrow-focussed and simple to use AI agent framework 🚀
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Twitter](https://img.shields.io/twitter/url/https/twitter.com/jtcorrindata.svg?style=social&label=Follow%20%40JTCorrinData)](https://twitter.com/jtcorrindata)
 
@@ -10,19 +10,17 @@ This library is still in active development and while the framework is small and
 
 You can use npm, or pnpm to install pnx
 
-`npm install pnx` or `pnpm add langchain`
+`npm install pnx` or `pnpm add pnx`
 
 ## 🌐 Where can I use it?
 
-pnx is written in TypeScript and can be used on both the server and the browser. At time of writing I've only tested on the server though.
-
-Running on serverless or edge functions is not recommended at this time.
+pnx is written in TypeScript and can be used on the server or serverless architecture. The `state` of the agent is passed back and forth over the course of a `plan`
 
 ## 🤔 What is this?
 
 pnx is heavily inspired and influenced by the amazing Langchain library. While I was making a few contributions to that codebase it was clear to me that while Langchain seemed to have everything, I only needed one specific part of it; the Plan and Execute agents. Unfortunately, that part was not fully fleshed out (and indeed still under an experimental flag).
 
-So, pnx is my attempt at Plan and Execute agents. It is therefore a lightweight and narrow focussed module that provides a simple and intuitive api for a 'plan and execute' AI agent/s.
+So, pnx is my attempt at Plan and Execute agents. It is therefore a lightweight and narrow-focussed module that provides a simple and intuitive api for a 'plan and execute' AI agent/s. 
 
 ## 🚀 Get started
 
@@ -64,7 +62,7 @@ Agents are essentially made up of 2 parts.
 
 - An executor whose job it is to loop over each step in the plan and request that the LLM determine what tool it should use, with what input, to fulfill the step.
 
-Both the planner and the executor are subclasses of the Chain class, which is inspired by the Langchain chain class - although here it is a much simpler, watered down version.
+Both the planner and the executor are subclasses of the Chain class, which is inspired by the Langchain chain class - although here it is a much simpler, watered down version. However, the executor class has a `reviewer` member class which allows the executor to integrate user responses to a plan, as well as reviewing and rewriting plans mid-way through.
 
 **🔗 Chains:**
 
@@ -82,7 +80,7 @@ Chains are dead simple and are made up of:
 Tools are really where the neat stuff happens. They are practically the same as Langchain tools except this library only accepts structured tools (I couldn't get my head around why non-structured tools exist), and structured tools here have a couple of extra config flags on them, namely:
 
 - requiresResponse
-- triggersReview (this is still in development)
+- triggersReview
 
 Here is the "Ask User" tool to show and example (and show how you can easily dream up your own tools):
 
