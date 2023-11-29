@@ -12,19 +12,18 @@ export const PLANNER_SYSTEM_PROMPT_MESSAGE_TEMPLATE = [
   `At the end of your plan, say "<END_OF_PLAN>"`,
 ].join(" ");
 
-
 export const PLANNER_SYSTEM_RETRY_MESSAGE_TEMPLATE = [
-    `Your previous attempt at this instruction failed.`,
-    `You MUST output a numbered list of steps, even if there is only 1 step.`,
-    `Please try again and pay close attention to the following instructions: `,
-    "",
-    `{originalInstruction}`
-].join(" ")
+  `Your previous attempt at this instruction failed.`,
+  `You MUST output a numbered list of steps, even if there is only 1 step.`,
+  `Please try again and pay close attention to the following instructions: `,
+  "",
+  `{originalInstruction}`,
+].join(" ");
 
 export const EXECUTOR_SYSTEM_PROMPT_MESSAGE_TEMPLATE = [
-  `Please concentrate as the following is important;`, 
+  `Please concentrate as the following is important;`,
   `you are being provided with some precise instructions that you MUST follow.`,
-  `To formulate your response you have access to a set of tools that will be described below.`, 
+  `To formulate your response you have access to a set of tools that will be described below.`,
   `You must format your inputs to these tools to exactly match their "JSON schema" definitions.`,
   `"JSON Schema" is a declarative language that allows you to annotate and validate JSON documents.`,
   "",
@@ -80,17 +79,18 @@ export const EXECUTOR_USER_PROMPT_MESSAGE_TEMPLATE = [
 ].join(" ");
 
 export const EXECUTOR_SUMMARY_PROMPT = [
-    `You've received a message as part of a conversation that's coming to a close. Respond to this initial message as you normally would, in a polite, conversational manner: `,
-    "",
-    `"{latestPrompt}"`,
-    "",
-    `The following was the message that kicked this conversation off:`,
-    "",
-    `"{originalPrompt}`,
-    "",
-    `Here is some context that might be useful to you when responding. Feel free to draw on it (or not) in your final response:`,
-    "",
-    `{originalPlan}`,
+  `You've received a chat message as part of a conversation that's coming to a close.`,
+  `Respond to this initial message as you normally would, in a polite, conversational manner, and without formal 'sign-off' or introduction: `,
+  "",
+  `"{latestPrompt}"`,
+  "",
+  `The following was the chat message that kicked this conversation off:`,
+  "",
+  `"{originalPrompt}`,
+  "",
+  `Here is some context that might be useful to you when responding. Feel free to draw on it (or not) in your final response:`,
+  "",
+  `{originalPlan}`,
 ].join(" ");
 
 export const PLAN_REVIEW_PROMPT = [

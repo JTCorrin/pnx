@@ -15,7 +15,7 @@ export class ExecutorOutputParser extends BaseOutputParser<StepResult> {
   async parse(text: string): Promise<StepResult> {
     const regex = /```(?:json)?(.*)(```)/gs;
     const actionMatch = regex.exec(text);
-    
+
     // TODO deal with this more gracefully. i.e. ask the model to try again "concentrate"
     if (actionMatch === null) {
       throw new Error(
@@ -36,7 +36,7 @@ export class ExecutorOutputParser extends BaseOutputParser<StepResult> {
       actionInput,
       actionOutput: "",
       responseRequired: false,
-      reviewRequired: false
+      reviewRequired: false,
     };
   }
 }

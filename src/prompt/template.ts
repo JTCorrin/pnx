@@ -58,6 +58,20 @@ export class PromptTemplate {
     this.outPutString = this.format();
   }
 
+  static rehydrate(data: any): PromptTemplate {
+    if (data instanceof PromptTemplate) {
+      return data;
+    }
+
+    if (!data || typeof data !== "object" || !("template" in data)) {
+      throw new Error("Invalid data for rehydrating PromptTemplate");
+    }
+    const instance = new PromptTemplate(data.template);
+    instance.setInputs(data.inputVariables ?? {});
+    instance.outPutString = instance.format();
+    return instance;
+  }
+
   setInputs(inputs: InputVariables) {
     this.inputVariables = inputs;
   }

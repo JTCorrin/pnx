@@ -15,15 +15,15 @@ export class PlanOutputParser extends BaseOutputParser<Plan> {
    * @returns A `Plan` object consisting of a series of steps.
    */
   async parse(text: string): Promise<Plan> {
-    
     const regex = /(?<=^|\n| )\d+\.\s+(?=[A-Z`])/;
 
-    const steps = text.split(regex)
-    .slice(1)
-    .map(step => step.replace(/<END_OF_PLAN>/, '').trim())
+    const steps = text
+      .split(regex)
+      .slice(1)
+      .map((step) => step.replace(/<END_OF_PLAN>/, "").trim());
 
     return {
-      steps: steps.map(s => ({ text: s }))
+      steps: steps.map((s) => ({ text: s })),
     };
   }
 }

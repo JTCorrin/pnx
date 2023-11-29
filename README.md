@@ -20,7 +20,7 @@ pnx is written in TypeScript and can be used on the server or serverless archite
 
 pnx is heavily inspired and influenced by the amazing Langchain library. While I was making a few contributions to that codebase it was clear to me that while Langchain seemed to have everything, I only needed one specific part of it; the Plan and Execute agents. Unfortunately, that part was not fully fleshed out (and indeed still under an experimental flag).
 
-So, pnx is my attempt at Plan and Execute agents. It is therefore a lightweight and narrow-focussed module that provides a simple and intuitive api for a 'plan and execute' AI agent/s. 
+So, pnx is my attempt at Plan and Execute agents. It is therefore a lightweight and narrow-focussed module that provides a simple and intuitive api for a 'plan and execute' AI agent/s.
 
 ## 🚀 Get started
 
@@ -98,7 +98,7 @@ class AskUser extends StructuredTool<typeof AskUserSchema> {
       name: "Ask User",
       description: "use this when you need to ask the user a question",
       schema: AskUserSchema,
-      triggersReview: false,
+      requiresReview: false,
       requiresResponse: true,
       func: async (input) => {
         return input.question;

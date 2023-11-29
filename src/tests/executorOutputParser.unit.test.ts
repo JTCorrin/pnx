@@ -20,7 +20,7 @@ describe("ExecutorOutputParser", () => {
       actionInput: { key: "value" },
       actionOutput: "",
       reviewRequired: false,
-      responseRequired: false
+      responseRequired: false,
     };
 
     await expect(outputParser.parse(validText)).resolves.toEqual(
