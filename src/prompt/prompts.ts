@@ -9,7 +9,8 @@ export const PLANNER_SYSTEM_PROMPT_MESSAGE_TEMPLATE = [
   "{toolString}",
   "",
   `You must consider these tools when coming up with your plan.`,
-  `At the end of your plan, say "<END_OF_PLAN>"`,
+  `You must not separate the selection of the tool and input and the execution of the tool`,
+  `into separate steps. At the end of your plan, say "<END_OF_PLAN>"`,
 ].join(" ");
 
 export const PLANNER_SYSTEM_RETRY_MESSAGE_TEMPLATE = [
